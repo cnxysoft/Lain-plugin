@@ -5,7 +5,7 @@ import Cfg from '../lib/config/config.js'
 import LagrangeCore from './LagrangeCore/index.js'
 import ComWeChat from './WeChat/index.js'
 import shamrock from './shamrock/index.js'
-import LLOneBot from "./LLOneBot/index.js";
+import OneBotv11 from "./OneBotv11/index.js";
 
 class WebSocket {
   constructor () {
@@ -14,7 +14,7 @@ class WebSocket {
       '/Shamrock': shamrock,
       '/ComWeChat': ComWeChat,
       '/LagrangeCore': LagrangeCore,
-      '/LLOneBot': LLOneBot
+      '/OneBotv11': OneBotv11
     }
   }
 

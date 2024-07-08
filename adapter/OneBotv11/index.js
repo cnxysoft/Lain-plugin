@@ -6,7 +6,7 @@ import common from '../../lib/common/common.js'
 import { faceMap, pokeMap } from '../../model/shamrock/face.js'
 import api from './api.js'
 
-class LLOneBotCore {
+class OneBotv11Core {
   constructor (bot, request) {
     /** 存一下 */
     bot.request = request
@@ -17,7 +17,7 @@ class LLOneBotCore {
     /** 监听事件 */
     this.bot.on('message', (data) => this.event(data))
     /** 监听连接关闭事件 */
-    bot.on('close', () => logger.warn(`[Lain-plugin] [LLOneBot] QQ ${this.id} 连接已断开`))
+    bot.on('close', () => logger.warn(`[Lain-plugin] [OneBotv11] QQ ${this.id} 连接已断开`))
   }
 
   /** 收到请求 */
@@ -36,8 +36,8 @@ class LLOneBotCore {
       this[data?.post_type](data)
     } catch (error) {
       /** 处理错误打印日志 */
-      logger.error('[LLOneBot]事件处理错误', error)
-      logger.mark('[LLOneBot]事件处理错误', data)
+      logger.error('[OneBotv11]事件处理错误', error)
+      logger.mark('[OneBotv11]事件处理错误', data)
     }
   }
 
@@ -47,14 +47,14 @@ class LLOneBotCore {
       /** 生命周期 */
       case 'lifecycle':
         this.LoadBot()
-        common.info('Lain-plugin', `[LLOneBot] QQ ${this.id} 建立连接成功，正在加载资源中`)
+        common.info('Lain-plugin', `[OneBotv11] QQ ${this.id} 建立连接成功，正在加载资源中`)
         break
       /** 心跳 */
       case 'heartbeat':
-        common.debug('Lain-plugin', `[LLOneBot] QQ ${this.id} 收到心跳：${JSON.stringify(data.status, null, 2)}`)
+        common.debug('Lain-plugin', `[OneBotv11] QQ ${this.id} 收到心跳：${JSON.stringify(data.status, null, 2)}`)
         break
       default:
-        logger.error(`[LLOneBot][未知事件] ${JSON.stringify(data)}`)
+        logger.error(`[OneBotv11][未知事件] ${JSON.stringify(data)}`)
         break
     }
   }
@@ -70,7 +70,7 @@ class LLOneBotCore {
     data.post_type = 'message'
     /** 屏蔽由喵崽处理过后发送后的消息 */
     await common.sleep(1500)
-    if (await redis.get(`LLOneBot:${this.id}:${data.message_id}`)) return
+    if (await redis.get(`OneBotv11:${this.id}:${data.message_id}`)) return
     /** 转置消息后给喵崽 */
     await Bot.emit('message', await this.ICQQEvent(data))
   }
@@ -92,7 +92,7 @@ class LLOneBotCore {
       }
     })().catch(common.error)
     switch (data.notice_type) {
-      case 'group':
+      case 'group_recall':
         try {
           let gl = Bot[this.id].gl.get(data.group_id)
           data = { ...data, ...gl }
@@ -107,7 +107,7 @@ class LLOneBotCore {
         data.notice_type = 'group'
         let subType = data.sub_type
         data.sub_type = 'increase'
-        data.user_id = data.target_id
+        // data.user_id = data.target_id
         if (this.id === data.user_id) {
           common.info(this.id, `机器人加入群聊：[${data.group_id}}]`)
         } else {
@@ -121,14 +121,15 @@ class LLOneBotCore {
             }
           }
         }
-        return await Bot.emit('notice.group', await this.ICQQEvent(data))
+        break
+        // return await Bot.emit('notice.group', await this.ICQQEvent(data))
       }
       case 'group_decrease': {
         data.notice_type = 'group'
         data.sub_type = 'decrease'
-        data.user_id = data.target_id
+        // data.user_id = data.target_id
         if (this.id === data.user_id) {
-          common.info(this.id, data.operator_id
+          common.info(this.id, data.operator_id != data.user_id
             ? `机器人被[${data.operator_id}]踢出群聊：[${data.group_id}}]`
             : `机器人退出群聊：[${data.group_id}}]`)
           // 移除该群的信息
@@ -136,17 +137,18 @@ class LLOneBotCore {
           Bot[this.id].gl.delete(data.group_id)
           Bot[this.id].gml.delete(data.group_id)
         } else {
-          common.info(this.id, data.operator_id
+          common.info(this.id, data.operator_id != data.user_id
             ? `成员[${data.user_id}]被[${data.operator_id}]踢出群聊：[${data.group_id}}]`
             : `成员[${data.user_id}]退出群聊[${data.group_id}}]`)
         }
-        return await Bot.emit('notice.group', await this.ICQQEvent(data))
+        break
+        // return await Bot.emit('notice.group', await this.ICQQEvent(data))
       }
       case 'group_admin': {
         data.notice_type = 'group'
         data.set = data.sub_type === 'set'
         data.sub_type = 'admin'
-        data.user_id = data.target_id
+        // data.user_id = data.target_id
         if (this.id === data.user_id) {
           let gml = await Bot[this.id].gml.get(data.group_id)
           gml[this.id] = { ...gml[this.id] }
@@ -170,7 +172,8 @@ class LLOneBotCore {
           }
           Bot[this.id].gml.set(data.group_id, { ...gml })
         }
-        return await Bot.emit('notice.group', await this.ICQQEvent(data))
+        break
+        // return await Bot.emit('notice.group', await this.ICQQEvent(data))
       }
       case 'group_ban': {
         data.notice_type = 'group'
@@ -180,33 +183,34 @@ class LLOneBotCore {
         } else {
           data.sub_type = 'ban'
         }
-        if (this.id === data.target_id) {
+        if (this.id === data.user_id) {
           common.info(this.id, data.duration === 0
             ? `机器人[${this.id}]在群[${data.group_id}]被解除禁言`
             : `机器人[${this.id}]在群[${data.group_id}]被禁言${data.duration}秒`)
         } else {
           common.info(this.id, data.duration === 0
-            ? `成员[${data.target_id}]在群[${data.group_id}]被解除禁言`
-            : `成员[${data.target_id}]在群[${data.group_id}]被禁言${data.duration}秒`)
+            ? `成员[${data.user_id}]在群[${data.group_id}]被解除禁言`
+            : `成员[${data.user_id}]在群[${data.group_id}]被禁言${data.duration}秒`)
         }
         // 异步加载或刷新该群的群成员列表以更新禁言时长
         this.loadGroupMemberList(data.group_id)
-        return await Bot.emit('notice.group', await this.ICQQEvent(data))
+        break
+        //return await Bot.emit('notice.group', await this.ICQQEvent(data))
       }
       case 'notify':
         switch (data.sub_type) {
           case 'poke': {
             let action = data.poke_detail?.action || '戳了戳'
             let suffix = data.poke_detail?.suffix || ''
-            common.info(this.id, `[${data.operator_id}]${action}[${data.target_id}]${suffix}`)
+            common.info(this.id, `[${data.user_id}]${action}[${data.target_id}]${suffix}`)
             break
           }
           case 'title': {
             common.info(this.id, `群[${data.group_id}]成员[${data.user_id}]获得头衔[${data.title}]`)
             let gml = Bot[this.id].gml.get(data.group_id)
-            let user = gml[data.user_id]
+            let user = gml.get(data.user_id)
             user.title = data.title
-            gml[data.user_id] = user
+            gmgml.set(data.user_id, user)
             Bot[this.id].gml.set(data.group_id, gml)
             break
           }
@@ -225,13 +229,16 @@ class LLOneBotCore {
         break
       }
       case 'group_card': {
+        data.notice_type = 'group'
+        data.sub_type = 'card'
         common.info(this.id, `群[${data.group_id}]成员[${data.user_id}]群名片变成为${data.card_new}`)
         let gml = Bot[this.id].gml.get(data.group_id)
-        let user = gml[data.user_id]
+        let user = gml.get(data.user_id)
         user.card = data.card_new
-        gml[data.user_id] = user
+        gml.set(data.user_id, user)
         Bot[this.id].gml.set(data.group_id, gml)
-        return await Bot.emit('notice.group', await this.ICQQEvent(data))
+        break
+        // return await Bot.emit('notice.group', await this.ICQQEvent(data))
       }
       case 'friend_recall':
         data.sub_type = 'recall'
@@ -240,8 +247,16 @@ class LLOneBotCore {
           let fl = Bot[this.id].fl.get(data.user_id)
           data = { ...data, ...fl }
         } catch { }
-        common.info(this.id, `好友消息撤回：[${data.user_name}(${data.user_id})] ${data.message_id}`)
-        return await Bot.emit('notice.friend', await this.ICQQEvent(data))
+
+        common.info(this.id, `好友消息撤回：[${data.remark || data.nickname}(${data.user_id})] ${data.message_id}`)
+        break
+        // return await Bot.emit('notice.friend', await this.ICQQEvent(data))
+      case 'group_upload': {
+        data.notice_type = 'group'
+        data.sub_type = 'upload'
+        common.info(this.id, `群[${data.group_id}]成员[${data.user_id}]上传了文件`)
+        break
+      }
       default:
     }
     return await Bot.emit('notice', await this.ICQQEvent(data))
@@ -264,7 +279,7 @@ class LLOneBotCore {
           common.info(this.id, `[${data.user_id}]申请入群[${data.group_id}]: ${data.tips}`)
         } else {
           // invite
-          common.info(this.id, `[${data.user_id}]邀请机器人入群[${data.group_id}]: ${data.tips}`)
+          common.info(this.id, `[${data.user_id}]邀请机器人入群[${data.group_id}]: ${data.tips || '未附言'}`)
         }
         break
       }
@@ -289,7 +304,7 @@ class LLOneBotCore {
           common.info(this.id, `[${data.user_id}]申请入群[${data.group_id}]: ${data.tips}`)
         } else {
           // invite
-          common.info(this.id, `[${data.user_id}]邀请机器人入群[${data.group_id}]: ${data.tips}`)
+          common.info(this.id, `[${data.user_id}]邀请机器人入群[${data.group_id}]: ${data.tips || '未附言'}`)
         }
         break
       }
@@ -318,7 +333,8 @@ class LLOneBotCore {
       tl: new Map(),
       gml: new Map(),
       guilds: new Map(),
-      adapter: 'LLOneBot',
+      recallMsgs: new Map(),
+      adapter: 'OneBotv11',
       uin: this.id,
       tiny_id: String(this.id),
       avatar: `https://q1.qlogo.cn/g?b=qq&s=0&nk=${this.id}`,
@@ -332,7 +348,7 @@ class LLOneBotCore {
       getGroupMemberInfo: async (group_id, user_id, no_cache) => await this.getGroupMemberInfo(Number(group_id), Number(user_id), no_cache),
       removeEssenceMessage: async (msg_id) => await this.removeEssenceMessage(msg_id),
       makeForwardMsg: async (message) => await this.makeForwardMsg(message),
-      getMsg: (msg_id) => '',
+      getMsg: (msg_id) => this.getMSG(msg_id),
       quit: (group_id) => this.quit(group_id),
       getFriendMap: () => Bot[this.id].fl,
       getGroupList: () => Bot[this.id].gl,
@@ -343,8 +359,9 @@ class LLOneBotCore {
       _loadGroupMemberList: this.loadGroupMemberList,
       _loadFriendList: this.loadFriendList,
       _loadAll: this.LoadAll,
-      readMsg: async () => common.recvMsg(this.id, 'LLOneBot', true),
-      MsgTotal: async (type) => common.MsgTotal(this.id, 'LLOneBot', type, true),
+      readMsg: async () => common.recvMsg(this.id, 'OneBotv11', true),
+      MsgTotal: async (type) => common.MsgTotal(this.id, 'OneBotv11', type, true),
+      setAvatar: async (imgPath) => await this.setAvatar(String(imgPath)),
       api: new Proxy(api, {
         get: (target, prop) => {
           try {
@@ -368,7 +385,7 @@ class LLOneBotCore {
     Bot[this.id].version = { id: 'QQ', name: version_info.app_name, version: version_info.app_version }
 
     /** 重启 */
-    await common.init('Lain:restart:LLOneBot')
+    await common.init('Lain:restart:OneBotv11')
     /** 保存uin */
     if (!Bot.adapter.includes(this.id)) Bot.adapter.push(this.id)
     /** 加载缓存资源 */
@@ -399,9 +416,17 @@ class LLOneBotCore {
 
     Bot[this.id].cookies = {}
 
-    const log = `LLOneBot加载资源成功：加载了${Bot[this.id].fl.size}个好友，${Bot[this.id].gl.size}个群。`
+    const log = `OneBotv11加载资源成功：加载了${Bot[this.id].fl.size}个好友，${Bot[this.id].gl.size}个群。`
     common.info(this.id, log)
     return log
+  }
+
+  /** 设置头像 */
+  async setAvatar (imgPath) {
+    const param = {
+      file: imgPath
+    }
+    return await api.SendApi(this.id, "set_qq_avatar", param)
   }
 
   /** 群列表 */
@@ -410,7 +435,7 @@ class LLOneBotCore {
     for (let retries = 0; retries < 5; retries++) {
       groupList = await api.get_group_list(id)
       if (!(groupList && Array.isArray(groupList))) {
-        common.error(this.id, `LLOneBot群列表获取失败，正在重试：${retries + 1}`)
+        common.error(this.id, `OneBotv11群列表获取失败，正在重试：${retries + 1}`)
       }
       await common.sleep(50)
     }
@@ -434,7 +459,7 @@ class LLOneBotCore {
       let gml = new Map()
       let memberList = await api.get_group_member_list(id, groupId)
       for (const user of memberList) {
-        user.card = user.nickname
+        user.card = user.card
         user.uin = this.id
         gml.set(user.user_id, user)
       }
@@ -450,19 +475,19 @@ class LLOneBotCore {
     for (let retries = 0; retries < 5; retries++) {
       friendList = await api.get_friend_list(id)
       if (!(friendList && Array.isArray(friendList))) {
-        common.error(this.id, `LLOneBot好友列表获取失败，正在重试：${retries + 1}`)
+        common.error(this.id, `OneBotv11好友列表获取失败，正在重试：${retries + 1}`)
       }
       await common.sleep(50)
     }
 
     /** 好友列表获取失败 */
     if (!friendList || !(typeof friendList === 'object')) {
-      common.error(this.id, 'LLOneBot好友列表获取失败次数过多，已停止重试')
+      common.error(this.id, 'OneBotv11好友列表获取失败次数过多，已停止重试')
     }
 
     if (friendList && typeof friendList === 'object') {
       for (let i of friendList) {
-        i.nickname = i.user_name || i.user_displayname || i.user_remark
+        i.nickname = i.nickname || i.user_displayname || i.remark
         i.uin = this.id
         /** 给锅巴用 */
         Bot.fl.set(i.user_id, i)
@@ -476,8 +501,8 @@ class LLOneBotCore {
   /** 群对象 */
   pickGroup (group_id) {
     const name = Bot[this.id].gl.get(group_id)?.group_name || group_id
-    const is_admin = Bot[this.id].gml.get(group_id)?.[this.id]?.role === 'admin'
-    const is_owner = Bot[this.id].gml.get(group_id)?.[this.id]?.role === 'owner'
+    const is_admin = (Bot[this.id].gml.get(group_id)[this.id]?.role || Bot[this.id].gml.get(group_id)?.get(this.id)?.role) === 'admin'
+    const is_owner = (Bot[this.id].gml.get(group_id)[this.id]?.role || Bot[this.id].gml.get(group_id)?.get(this.id)?.role) === 'owner'
     return {
       name,
       is_admin: is_owner || is_admin,
@@ -581,7 +606,7 @@ class LLOneBotCore {
   pickMember (group_id, user_id, refresh = false, cb = () => { }) {
     if (!refresh) {
       /** 取缓存！！！别问为什么，因为傻鸟同步 */
-      let member = Bot[this.id].gml.get(group_id)?.[user_id] || {}
+      let member = Bot[this.id].gml.get(group_id)?.get(user_id) || {}
       member.info = { ...member }
       member.getAvatarUrl = (size = 0) => `https://q1.qlogo.cn/g?b=qq&s=${size}&nk=${user_id}`
       return member
@@ -671,7 +696,7 @@ class LLOneBotCore {
       member.card = member.nickname
       return member
     } catch {
-      return { card: 'LLOneBot', nickname: 'LLOneBot' }
+      return { card: 'OneBotv11', nickname: 'OneBotv11' }
     }
   }
 
@@ -708,9 +733,16 @@ class LLOneBotCore {
     if (msg.length) {
       for (let i of msg) {
         try {
-          const { message: content } = await this.getLLOneBotCore(i)
-          // const id = await this.sendApi('send_forward_msg', { messages: [{ type: 'node', data: { name: this.nickname || 'LagrangeCore', uin: String(this.id), content } }] })
-          makeForwardMsg.message.push({ type: 'node', data: { type: 'node', data: { name: this.nickname || 'LLOneBot', uin: String(this.id), content } } })
+          let { message: content } = await this.getOneBotv11Core(i)
+          if (content[0].type == "node") {
+            for (let ii of content) {
+              for (let iii of ii.data?.data?.content || ii.data?.content) {
+                content = iii
+              }
+            }
+          }
+          makeForwardMsg.message.push({ type: 'node', data: {type: 'node', data: { name: this.nickname || 'OneBotv11', uin: String(this.id), content }}})
+          // const id = await this.sendApi('send_forward_msg', { user_id: String(this.id), messages: [{ type: 'node', data: { name: this.nickname || 'OneBotv11', uin: String(this.id), content } }] })
         } catch (err) {
           common.error(this.id, err)
         }
@@ -721,6 +753,8 @@ class LLOneBotCore {
 
   /** 撤回消息 */
   async recallMsg (msg_id) {
+    // 把已撤回的MSGID存起来，椰奶校验撤回成功与否要用到
+    Bot[this.id].recallMsgs.set(msg_id, true)
     return await api.delete_msg(this.id, msg_id)
   }
 
@@ -786,8 +820,8 @@ class LLOneBotCore {
     /** 通知事件 */
     const noticePostType = async function () {
       if (e.sub_type === 'poke') {
-        e.action = e.poke_detail.action
-        e.raw_message = `${e.operator_id} ${e.action} ${e.user_id}`
+        e.action = e.poke_detail?.action || '戳了戳'
+        e.raw_message = `${e.user_id} ${e.action} ${e.target_id}`
       }
 
       if (e.group_id) {
@@ -866,7 +900,7 @@ class LLOneBotCore {
     e.getAvatarUrl = (size = 0) => `https://q1.qlogo.cn/g?b=qq&s=${size}&nk=${user_id}`
 
     /** 添加适配器标识 */
-    e.adapter = 'LLOneBot'
+    e.adapter = 'OneBotv11'
 
     /** 某些事件需要e.bot，走监听器没有。 */
     e.bot = Bot[this.id]
@@ -898,7 +932,7 @@ class LLOneBotCore {
           try {
             let qq = i.data.qq
             ToString.push(`{at:${qq}}`)
-            let groupMemberList = Bot[this.id].gml.get(group_id)?.[qq]
+            let groupMemberList = Bot[this.id].gml.get(group_id)?.get(qq)
             let at = groupMemberList?.nickname || groupMemberList?.card || qq
             raw_message.push(`@${at}`)
             log_message.push(at == qq ? `@${qq}` : `<@${at}:${qq}>`)
@@ -956,13 +990,13 @@ class LLOneBotCore {
           break
         /** 文件 */
         case 'file':
-          file = { ...i.data, fid: i.data.id }
-          message.push({ type: 'file', ...i.data, fid: i.data.id })
+          file = { ...i.data, fid: i.data.file_id }
+          message.push({ type: 'file', ...i.data, fid: i.data.file_id })
           raw_message.push('[文件]')
           log_message.push(`<视频:${i.data?.url || i.data.file}>`)
-          ToString.push(`{file:${i.data.id}}`)
+          ToString.push(`{file:${i.data.file_id}}`)
           /** 存一手，给获取函数 */
-          redis.set(i.data.id, JSON.stringify(i.data))
+          redis.set(i.data.file_id, JSON.stringify(i.data))
           break
         /** 转发 */
         case 'forward':
@@ -1010,14 +1044,14 @@ class LLOneBotCore {
         case 'dice':
           message.push({ type: 'dice', ...i.data })
           raw_message.push('[骰子]')
-          log_message.push(`<骰子:${i.data.id}>`)
+          log_message.push(`<骰子:${i.data.result}>`)
           ToString.push(`{dice:${i.data}}`)
           break
         /** 剪刀石头布 (NTQQ废弃) */
         case 'rps':
           message.push({ type: 'rps', ...i.data })
           raw_message.push('[剪刀石头布]')
-          log_message.push(`<剪刀石头布:${i.data.id}>`)
+          log_message.push(`<剪刀石头布:${i.data.result}>`)
           ToString.push(`{rps:${i.data}}`)
           break
         /** 戳一戳 */
@@ -1093,6 +1127,52 @@ class LLOneBotCore {
   }
 
   /**
+   * 获取指定消息
+   * @param {number} msg_id
+   * @return {array|false} -
+   */
+async getMSG (msg_id) {
+    if (!msg_id) return false
+    // 查询是否已经撤回过，撤回过的默认不予读取
+    if (Bot[this.id].recallMsgs.get(msg_id)) {
+        Bot[this.id].recallMsgs = new Map()
+        return false
+    }
+    let source
+    try {
+      let retryCount = 0
+
+      while (retryCount < 2) {
+        source = await api.get_msg(this.id, msg_id)
+        if (typeof source === 'string') {
+          common.error(this.id, `获取引用消息内容失败，正在重试：第 ${retryCount} 次`)
+          retryCount++
+        } else {
+          break
+        }
+      }
+
+      if (typeof source === 'string') {
+        common.error(this.id, '获取引用消息内容失败，重试次数上限，已终止')
+        return false
+      }
+      common.debug('', source)
+
+      source = {
+        ...source,
+        time: source.time,
+        seq: source.message_id,
+        user_id: source.sender.user_id,
+        message: source.message
+      }
+      return source
+    } catch (error) {
+      logger.error(error)
+      return false
+    }
+}
+
+  /**
    * 获取被引用的消息
    * @param {object} i
    * @param {number} group_id
@@ -1149,7 +1229,7 @@ class LLOneBotCore {
  * @param {boolean} quote - 是否引用回复
  */
   async sendReplyMsg (e, id, msg, quote) {
-    let { message, raw_message, node } = await this.getLLOneBotCore(msg)
+    let { message, raw_message, node } = await this.getOneBotv11Core(msg)
 
     if (quote) {
       message.unshift({ type: 'reply', data: { id: String(e.message_id) } })
@@ -1166,7 +1246,7 @@ class LLOneBotCore {
    * @param {string|object|array} msg - 消息内容
    */
   async sendFriendMsg (user_id, msg) {
-    const { message, raw_message, node } = await this.getLLOneBotCore(msg)
+    const { message, raw_message, node } = await this.getOneBotv11Core(msg)
     return await api.send_private_msg(this.id, user_id, message, raw_message, node)
   }
 
@@ -1176,7 +1256,7 @@ class LLOneBotCore {
    * @param {string|object|array} msg - 消息内容
    */
   async sendGroupMsg (group_id, msg) {
-    const { message, raw_message, node } = await this.getLLOneBotCore(msg)
+    const { message, raw_message, node } = await this.getOneBotv11Core(msg)
     return await api.send_group_msg(this.id, group_id, message, raw_message, node)
   }
 
@@ -1184,7 +1264,7 @@ class LLOneBotCore {
    * 转换message为LagrangeCore格式
    * @param {string|Array|object} data - 消息内容
    */
-  async getLLOneBotCore (data) {
+  async getOneBotv11Core (data) {
     let node = data?.test || false
     /** 标准化消息内容 */
     data = common.array(data)
@@ -1200,8 +1280,8 @@ class LLOneBotCore {
     for (let i of data) {
       switch (i.type) {
         case 'at':
-          message.push({ type: 'at', data: { qq: String(i.qq) } })
-          raw_message.push(`<@${i.qq}>`)
+          message.push({ type: 'at', data: { qq: String(i.qq === 0 && i.id ? i.id : i.qq) } })
+          raw_message.push(`<@${i.qq || i.id}>`)
           break
         case 'face':
           message.push({ type: 'face', data: { id: Number(i.id) } })
@@ -1259,6 +1339,9 @@ class LLOneBotCore {
             } else {
               raw_message.push(`<图片:${file}>`)
             }
+            // let file = await Bot.FileToUrl(i.file)
+            // file = file.url
+            // raw_message.push(`<图片:${file}>`)
             message.push({ type: 'image', data: { file } })
           } catch (err) {
             message.push({ type: 'text', data: { text: JSON.stringify(err) } })
@@ -1317,6 +1400,10 @@ class LLOneBotCore {
           raw_message.push(`<转发消息:${i.id}>`)
           break
         case 'node':
+          node = true
+          message.push({ type: 'node', data: { ...i.data } })
+          raw_message.push(`<转发消息:${ i.data.id || "自造" }>`)
+          break
         default:
           // 为了兼容更多字段，不再进行序列化，风险是有可能未知字段导致LagrangeCore崩溃
           message.push({ type: i.type, data: { ...i.data } })
@@ -1344,7 +1431,7 @@ class LLOneBotCore {
     this.bot.send(log)
 
     /** 等待响应 */
-    for (let i = 0; i < 1200; i++) {
+    for (let i = 0; i < 12000; i++) {
       const data = lain.echo[echo]
       if (data) {
         delete lain.echo[echo]
@@ -1358,15 +1445,15 @@ class LLOneBotCore {
   }
 }
 
-/** LLOneBot的WebSocket服务器实例 */
-const LLOneBotWS = new WebSocketServer({ noServer: true })
+/** OneBotv11的WebSocket服务器实例 */
+const OneBotv11WS = new WebSocketServer({ noServer: true })
 
 /** 连接 */
-LLOneBotWS.on('connection', async (bot, request) => new LLOneBotCore(bot, request))
+OneBotv11WS.on('connection', async (bot, request) => new OneBotv11Core(bot, request))
 
 /** 捕获错误 */
-LLOneBotWS.on('error', async error => logger.error(error))
+OneBotv11WS.on('error', async error => logger.error(error))
 
-export default LLOneBotWS
+export default OneBotv11WS
 
-common.info('Lain-plugin', 'LLOneBot适配器加载完成')
+common.info('Lain-plugin', 'OneBotv11适配器加载完成')

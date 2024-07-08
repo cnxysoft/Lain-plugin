@@ -44,7 +44,7 @@ pnpm config set sharp_binary_host "https://npmmirror.com/mirrors/sharp" && pnpm 
 - [QQBot(群和频道)](./docs/QQBot.md)
 - [网页版微信](./docs/WeXin.md)
 - [Lagrange.Core](./docs/Lagrange.Core.md)
-- LLOneBot: 换个地址的事，都连`/LLOneBot`就完事了
+- OneBotv11: 换个地址的事，都连`/OneBotv11`就完事了
 
 ## 4.设置主人
 
@@ -69,7 +69,7 @@ pnpm config set sharp_binary_host "https://npmmirror.com/mirrors/sharp" && pnpm 
 - QQBot：`QQBot`
 - 网页版微信：`WeXin`
 - LagrangeCore: `LagrangeCore`
-- LLOneBot: `LLOneBot`
+- OneBotv11: `OneBotv11`
 
 ## 适配进度
 - [x] 标准输入
@@ -80,7 +80,7 @@ pnpm config set sharp_binary_host "https://npmmirror.com/mirrors/sharp" && pnpm 
 - [x] Shamrock适配器
 - [x] QQBot适配器
 - [x] LagrangeCore
-- [x] LLOneBot
+- [x] OneBotv11
 
 ## 特别鸣谢
 
@@ -95,4 +95,4 @@ pnpm config set sharp_binary_host "https://npmmirror.com/mirrors/sharp" && pnpm 
 - [QQBot按钮库](https://gitee.com/lava081/button)
 - [xiaoye12123](https://gitee.com/xiaoye12123)
 - [Lagrange.Core](https://github.com/LagrangeDev/Lagrange.Core)
-- [LLOneBot](https://github.com/LLOneBot/LLOneBot)
+- [OneBotv11](https://github.com/OneBotv11/OneBotv11)

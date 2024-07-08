@@ -7,6 +7,7 @@ import crypto from 'crypto'
 import common from '../../lib/common/common.js'
 import Cfg from '../../lib/config/config.js'
 import { fileTypeFromBuffer } from 'file-type'
+import { Stream } from 'stream'
 
 /**
 * 传入文件，返回Buffer
@@ -23,7 +24,7 @@ Bot.Buffer = async function (file, data) {
   if (Buffer.isBuffer(file) || file instanceof Uint8Array) {
     if (data?.buffer) return file
     return file
-  } else if (file instanceof fs.ReadStream) {
+  } else if (file instanceof fs.ReadStream || file instanceof Stream.PassThrough) {
     return await Bot.Stream(file)
   } else if (fs.existsSync(file.replace(/^file:\/\//, ''))) {
     if (data?.file) return file
@@ -62,7 +63,7 @@ Bot.Base64 = async function (file, data) {
   if (Buffer.isBuffer(file) || file instanceof Uint8Array) {
     if (data?.buffer) return file
     return file.toString('base64')
-  } else if (file instanceof fs.ReadStream) {
+  } else if (file instanceof fs.ReadStream || file instanceof Stream.PassThrough) {
     return await Bot.Stream(file, { base: true })
   } else if (fs.existsSync(file.replace(/^file:\/\//, ''))) {
     if (data?.file) return file
@@ -213,7 +214,7 @@ Bot.FileToPath = async function (file, _path) {
   if (Buffer.isBuffer(file) || file instanceof Uint8Array) {
     fs.writeFileSync(_path, file)
     return _path
-  } else if (file instanceof fs.ReadStream) {
+  } else if (file instanceof fs.ReadStream || file instanceof Stream.PassThrough) {
     const buffer = await Bot.Stream(file)
     fs.writeFileSync(_path, buffer)
     return _path
@@ -271,7 +272,7 @@ Bot.toType = function (i) {
   } else if (i?.type === 'Buffer' || i instanceof Uint8Array || Buffer.isBuffer(i?.data || i)) {
     type = 'buffer'
     file = i?.data || i
-  } else if (i instanceof fs.ReadStream || i?.path) {
+  } else if (i instanceof fs.ReadStream || i?.path || i instanceof Stream.PassThrough ) {
     // 检查是否是ReadStream类型
     if (fs.existsSync(i.path)) {
       file = `file://${i.path}`
@@ -338,7 +339,7 @@ Bot.FormatFile = async function (file) {
       if (Buffer.isBuffer(file) || file instanceof Uint8Array) return file
 
       /** 流 */
-      if (file instanceof fs.ReadStream) return await Bot.Stream(file, { base: true })
+      if (file instanceof fs.ReadStream || file instanceof Stream.PassThrough) return await Bot.Stream(file, { base: true })
 
       /** i.file */
       if (file.file) return str(file.file)

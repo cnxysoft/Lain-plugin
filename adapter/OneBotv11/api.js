@@ -647,6 +647,7 @@ let api = {
   */
   async send_group_forward_msg (id, group_id, messages) {
     const params = { group_id, messages }
+    // common.info('%j', params)
     return await this.SendApi(id, 'send_group_forward_msg', params)
   },
 
@@ -695,6 +696,10 @@ let api = {
       // res = await this.SendApi(uin, 'send_private_msg', { user_id, message: { type: 'forward', data: { id } } })
       res = await this.send_private_forward_msg(uin, user_id, message.map(i => i.data))
     } else {
+      if (message[0].type == "at") {
+        message.splice(0,1)
+
+      } 
       const params = { user_id, message }
       res = await this.SendApi(uin, 'send_private_msg', params)
     }
@@ -723,10 +728,9 @@ let api = {
     }
     /** 打印日志 */
     common.info(uin, `<发送群聊:${group_name}> => ${raw_message}`)
-
     let res
     if (node) {
-      // const id = await this.SendApi(uin, 'send_forward_msg', { messages: message.map(i => i.data) })
+      //const id = await this.SendApi(uin, 'send_forward_msg', { messages: message.map(i => i.data) })
       // res = await this.SendApi(uin, 'send_group_msg', { group_id, message: { type: 'forward', data: { id } } })
       res = await this.send_group_forward_msg(uin, group_id, message.map(i => i.data))
     } else {
@@ -751,17 +755,18 @@ let api = {
     const echo = randomUUID()
     /** 序列化 */
     const log = JSON.stringify({ echo, action, params })
-
     common.debug(id, '[ws] send -> ' + log)
     Bot[id].ws.send(log)
 
     /** 等待响应 */
-    for (let i = 0; i < 1200; i++) {
+    for (let i = 0; i < 12000; i++) {
       const data = lain.echo[echo]
       if (data) {
         delete lain.echo[echo]
-        if (data.status === 'ok') return data.data
-        else common.error(id, data); throw data
+        if (data.status === 'ok') { 
+          if (data.data === null) data.data = {"message_id": 0}
+	  return data.data
+	} else { common.error(id, data); throw data }
       } else {
         await common.sleep(50)
       }
