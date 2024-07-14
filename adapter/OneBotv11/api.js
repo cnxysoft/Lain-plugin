@@ -5,6 +5,17 @@ import Cfg from '../../lib/config/config.js'
 
 let api = {
   /**
+   * 回应消息
+   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
+   * @param {string} message_id - 消息id
+   * @param {string} emoji_id - 回应的表情id
+   */
+  async set_msg_emoji_like (id, message_id, emoji_id) {
+    const params = { message_id, emoji_id }
+    return await this.SendApi(id, 'set_msg_emoji_like', params)
+  },
+
+  /**
    * 获取消息
    * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
    * @param {string} message_id - 消息id

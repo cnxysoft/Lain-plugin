@@ -349,6 +349,7 @@ class OneBotv11Core {
       removeEssenceMessage: async (msg_id) => await this.removeEssenceMessage(msg_id),
       makeForwardMsg: async (message) => await this.makeForwardMsg(message),
       getMsg: (msg_id) => this.getMSG(msg_id),
+      setMsgEmojiLike: (msg_id, emoji_id) => this.setMsgEmojiLike(msg_id, emoji_id),
       quit: (group_id) => this.quit(group_id),
       getFriendMap: () => Bot[this.id].fl,
       getGroupList: () => Bot[this.id].gl,
@@ -1125,6 +1126,17 @@ class OneBotv11Core {
     log_message = log_message.join(' ').trim()
     return { message, ToString, raw_message, log_message, source, file }
   }
+
+  /**
+   * 回应指定消息
+   * @param {number} msg_id - 消息id
+   * @param {string} emoji_id - 表情id
+   * @return {array|false} -
+   */
+  async setMsgEmojiLike (msg_id, emoji_id) {
+    if (!msg_id || !emoji_id) return false
+    return await api.set_msg_emoji_like(this.id, msg_id, emoji_id)
+}
 
   /**
    * 获取指定消息
