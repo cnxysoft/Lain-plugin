@@ -1,4 +1,8 @@
 # 这里是一处Lain-Plugin备份仓库，有一定修改适配云崽V4
+Github：
+```
+git clone --depth=1 -b v4 https://github.com/cnxysoft/Lain-plugin
+```
 ## 简介
 `Lain-plugin`是一个围绕喵崽`Miao-Yunzai`开发的多适配器插件，让喵崽接入`QQ频道`、`微信`、`shamrock`等三方平台~，不再局限于ICQQ。
 
