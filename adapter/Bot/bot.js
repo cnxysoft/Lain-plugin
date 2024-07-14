@@ -7,7 +7,6 @@ import crypto from 'crypto'
 import common from '../../lib/common/common.js'
 import Cfg from '../../lib/config/config.js'
 import { fileTypeFromBuffer } from 'file-type'
-import { Stream } from 'stream'
 
 /**
 * 传入文件，返回Buffer
@@ -24,7 +23,7 @@ Bot.Buffer = async function (file, data) {
   if (Buffer.isBuffer(file) || file instanceof Uint8Array) {
     if (data?.buffer) return file
     return file
-  } else if (file instanceof fs.ReadStream || file instanceof Stream.PassThrough) {
+  } else if (file instanceof fs.ReadStream) {
     return await Bot.Stream(file)
   } else if (fs.existsSync(file.replace(/^file:\/\//, ''))) {
     if (data?.file) return file
@@ -63,7 +62,7 @@ Bot.Base64 = async function (file, data) {
   if (Buffer.isBuffer(file) || file instanceof Uint8Array) {
     if (data?.buffer) return file
     return file.toString('base64')
-  } else if (file instanceof fs.ReadStream || file instanceof Stream.PassThrough) {
+  } else if (file instanceof fs.ReadStream) {
     return await Bot.Stream(file, { base: true })
   } else if (fs.existsSync(file.replace(/^file:\/\//, ''))) {
     if (data?.file) return file
@@ -119,10 +118,9 @@ Bot.uploadQQ = async function (file, uin = Bot.uin) {
   uin = Number(uin)
   const buffer = await Bot.Buffer(file)
   try {
-    await Bot[uin].pickGroup(Math.floor(Math.random() * 10000 + 1)).sendMsg([segment.image(buffer)])
-  } catch (e) {
-    throw new Error('上传图片失败', e)
-  }
+    const { message_id } = await Bot[uin].pickUser(uin).sendMsg([segment.image(buffer)])
+    await Bot[uin].pickUser(uin).recallMsg(message_id)
+  } catch { }
   const { width, height } = sizeOf(buffer)
   const md5 = crypto.createHash('md5').update(buffer).digest('hex').toUpperCase()
   const url = `https://gchat.qpic.cn/gchatpic_new/0/0-0-${md5}/0?term=2`
@@ -214,7 +212,7 @@ Bot.FileToPath = async function (file, _path) {
   if (Buffer.isBuffer(file) || file instanceof Uint8Array) {
     fs.writeFileSync(_path, file)
     return _path
-  } else if (file instanceof fs.ReadStream || file instanceof Stream.PassThrough) {
+  } else if (file instanceof fs.ReadStream) {
     const buffer = await Bot.Stream(file)
     fs.writeFileSync(_path, buffer)
     return _path
@@ -272,7 +270,7 @@ Bot.toType = function (i) {
   } else if (i?.type === 'Buffer' || i instanceof Uint8Array || Buffer.isBuffer(i?.data || i)) {
     type = 'buffer'
     file = i?.data || i
-  } else if (i instanceof fs.ReadStream || i?.path || i instanceof Stream.PassThrough ) {
+  } else if (i instanceof fs.ReadStream || i?.path) {
     // 检查是否是ReadStream类型
     if (fs.existsSync(i.path)) {
       file = `file://${i.path}`
@@ -339,7 +337,7 @@ Bot.FormatFile = async function (file) {
       if (Buffer.isBuffer(file) || file instanceof Uint8Array) return file
 
       /** 流 */
-      if (file instanceof fs.ReadStream || file instanceof Stream.PassThrough) return await Bot.Stream(file, { base: true })
+      if (file instanceof fs.ReadStream) return await Bot.Stream(file, { base: true })
 
       /** i.file */
       if (file.file) return str(file.file)
@@ -420,16 +418,7 @@ Bot.Button = function (list, line = 3) {
     if (Array.isArray(i)) {
       button.push(...Bot.Button(i, 10))
     } else {
-      if (typeof i.permission === 'string') {
-        if (i.permission === 'xxx') {
-          i.list = []
-        } else {
-          const openid = i.permission.split('-')
-          i.list = [openid[1] || openid[0]]
-        }
-        i.permission = false
-      }
-      let Button = {
+      arr.push({
         id: String(id),
         render_data: {
           label: i.text || i.label || i.link,
@@ -440,22 +429,15 @@ Bot.Button = function (list, line = 3) {
           type: i.type || (i.link ? 0 : 2),
           reply: i.reply || false,
           permission: i.permission || {
-            type: (i.admin && 1) || (i.list && '0') || (i.role && 3) || 2,
+            type: (i.admin && 1) || (i.list && 0) || (i.role && 3) || 2,
             specify_user_ids: i.list || [],
             specify_role_ids: i.role || []
           },
-          data: i.data || i.input || i.callback || i.link || i.text || i.label,
+          data: i.data || i.callback || i.link || i.text || i.label,
           enter: i.send || i.enter || 'callback' in i || false,
           unsupport_tips: i.tips || 'err'
         }
-      }
-      if (i.QQBot) {
-        if (i.QQBot.render_data)
-          Object.assign(Button.render_data, i.QQBot.render_data)
-        if (i.QQBot.action)
-          Object.assign(Button.action, i.QQBot.action)
-      }
-      arr.push(Button)
+      })
       if (index % line == 0 || index == list.length) {
         button.push({
           type: 'button',
