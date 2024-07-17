@@ -576,6 +576,7 @@ class OneBotv11Core {
   /** 好友对象 */
   pickFriend (user_id) {
     return {
+      thumbUp: async (times) => await this.thumbUp(user_id, times),
       sendMsg: async (msg) => await this.sendFriendMsg(user_id, msg, false),
       recallMsg: async (msg_id) => await this.recallMsg(msg_id),
       makeForwardMsg: async (message) => await this.makeForwardMsg(message),
@@ -601,6 +602,16 @@ class OneBotv11Core {
         return Promise.all(messages)
       }
     }
+  }
+
+   /**
+   * 好友点赞
+   * @param {number} user_id - 点赞用户
+   * @param {number} times - 点赞次数
+   * @return {Promise<void>} - 点赞结果
+   */
+  async thumbUp (user_id, times) {
+    return await api.send_like(this.id, user_id, times)
   }
 
   /** 群员对象 */
