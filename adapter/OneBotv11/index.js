@@ -690,13 +690,13 @@ class OneBotv11Core {
   /** 设置精华 */
   async setEssenceMessage (msg_id) {
     let res = await api.set_essence_msg(this.id, msg_id)
-    return res?.message === '成功' ? '加精成功' : res?.message
+    return res?.result?.errorCode === 0 ? '加精成功' : res?.result?.wording
   }
 
   /** 移除群精华消息 **/
   async removeEssenceMessage (msg_id) {
     let res = await api.delete_essence_msg(this.id, msg_id)
-    return res?.message === '成功' ? '加精成功' : res?.message
+    return res?.result?.errorCode  === 0 ? '移精成功' : res?.result?.wording
   }
 
   /** 获取群成员信息 */
@@ -1230,8 +1230,8 @@ async getMSG (msg_id) {
 
       source = {
         ...source,
-        time: source.message_id,
-        seq: source.message_id,
+        time: source.time,
+        seq: Number(source.message_id || msg_id),
         user_id: source.sender.user_id,
         message: raw_message,
         raw_message
