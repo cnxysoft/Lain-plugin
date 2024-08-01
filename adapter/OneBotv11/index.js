@@ -502,8 +502,8 @@ class OneBotv11Core {
   /** 群对象 */
   pickGroup (group_id) {
     const name = Bot[this.id].gl.get(group_id)?.group_name || group_id
-    const is_admin = (Bot[this.id].gml.get(group_id)[this.id]?.role || Bot[this.id].gml.get(group_id)?.get(this.id)?.role) === 'admin'
-    const is_owner = (Bot[this.id].gml.get(group_id)[this.id]?.role || Bot[this.id].gml.get(group_id)?.get(this.id)?.role) === 'owner'
+    const is_admin = (Bot[this.id].gml.get(group_id)?.[this.id]?.role || Bot[this.id].gml.get(group_id)?.get(this.id)?.role) === 'admin'
+    const is_owner = (Bot[this.id].gml.get(group_id)?.[this.id]?.role || Bot[this.id].gml.get(group_id)?.get(this.id)?.role) === 'owner'
     return {
       name,
       is_admin: is_owner || is_admin,
