@@ -770,7 +770,7 @@ let api = {
     Bot[id].ws.send(log)
 
     /** 等待响应 */
-    for (let i = 0; i < 12000; i++) {
+    for (let i = 0; i < 3600; i++) {
       const data = lain.echo[echo]
       if (data) {
         delete lain.echo[echo]

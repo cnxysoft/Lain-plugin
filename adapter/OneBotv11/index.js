@@ -210,7 +210,7 @@ class OneBotv11Core {
             let gml = Bot[this.id].gml.get(data.group_id)
             let user = gml.get(data.user_id)
             user.title = data.title
-            gmgml.set(data.user_id, user)
+            gml.set(data.user_id, user)
             Bot[this.id].gml.set(data.group_id, gml)
             break
           }
@@ -415,7 +415,41 @@ class OneBotv11Core {
       _this.loadFriendList()
     ])
 
+    /** 获取bkn */
+    try {
+      let { cookies } = await api.get_cookies(this.id, "qun.qq.com")
+      if (cookies) {
+        let match = cookies.match(/skey=([^;]+)/)
+        if (match) {
+          let skey = match[1]
+          let n = 5381
+          for (let e = skey || '', r = 0, o = e.length; r < o; ++r) {
+            n += (n << 5) + e.charAt(r).charCodeAt(0)
+          }
+          Bot[this.id].bkn = 2147483647 & n
+        }
+      }
+    } catch (err) {
+      common.warn(this.id, `OneBotv11获取bkn失败：${error}`)
+    }
+
+    /** 获取cookies */
     Bot[this.id].cookies = {}
+    let domains = ['aq.qq.com', 'buluo.qq.com', 'connect.qq.com', 'docs.qq.com', 'game.qq.com', 'gamecenter.qq.com', 'haoma.qq.com', 'id.qq.com', 'kg.qq.com', 'mail.qq.com', 'mma.qq.com', 'office.qq.com', 'openmobile.qq.com', 'qqweb.qq.com', 'qun.qq.com', 'qzone.qq.com', 'ti.qq.com', 'v.qq.com', 'vip.qq.com', 'y.qq.com', '']
+    for (let domain of domains) {
+      api.get_cookies(this.id, domain).then(ck => {
+        ck = ck?.cookies
+        if (ck) {
+          try {
+            // 适配椰奶逆天的ck转JSON方法
+            ck = ck.trim().replace(/\w+=;/g, '').replace(/\w+=$/g, '')
+          } catch (err) { }
+        }
+        Bot[this.id].cookies[domain] = ck
+      }).catch(error => {
+        common.debug(this.id, `${domain} 获取cookie失败：${error}`)
+      })
+    }
 
     const log = `OneBotv11加载资源成功：加载了${Bot[this.id].fl.size}个好友，${Bot[this.id].gl.size}个群。`
     common.info(this.id, log)
@@ -423,11 +457,16 @@ class OneBotv11Core {
   }
 
   /** 设置头像 */
-  async setAvatar (imgPath) {
+  async setAvatar (imgPath, groupId) {
+    let setAvatarApi = "set_qq_avatar"
     const param = {
-      file: imgPath
+      file: imgPath,
+      groupCode: groupId ? groupId.toString() : null
     }
-    return await api.SendApi(this.id, "set_qq_avatar", param)
+    if (groupId) {
+      setAvatarApi = "set_group_head"
+    }
+    return await api.SendApi(this.id, setAvatarApi, param)
   }
 
   /** 群列表 */
@@ -547,6 +586,8 @@ class OneBotv11Core {
       shareMusic: async (platform, id) => await this.shareMusic(group_id, platform, id),
       /** 获取文件下载地址 */
       getFileUrl: async (fid) => await this.getFileUrl(fid),
+      /** 设置群头像 */
+      setAvatar: async (imgPath) => await this.setAvatar(String(imgPath), group_id),
       /**
        * 获取聊天历史记录
        * @param msg_id 起始消息的message_id（默认为0，表示从最后一条发言往前）
@@ -940,7 +981,7 @@ class OneBotv11Core {
       switch (i.type) {
         /** AT 某人 */
         case 'at':
-          message.push({ type: 'at', qq: Number(i.data.qq) })
+          message.push({ type: 'at', qq: Number(i.data.qq) || 0})
           try {
             let qq = i.data.qq
             ToString.push(`{at:${qq}}`)
@@ -965,6 +1006,13 @@ class OneBotv11Core {
           raw_message.push(`[${faceMap[Number(i.data.id)] || '动画表情'}]`)
           log_message.push(`<${faceMap[Number(i.data.id)] || `动画表情:${i.data.id}`}>`)
           ToString.push(`{face:${i.data.id}}`)
+          break
+        /** 商城表情 */
+        case 'mface':
+          message.push({ type: 'mface', ...i.data })
+          raw_message.push(`${i.data.summary}` || '商城表情')
+          log_message.push(`<${i.data.summary}>` || `商城表情:${i.data.emoji_id}`)
+          ToString.push(`{mface:${i.data.emoji_id}}`)
           break
         /** 回复 */
         case 'reply':
@@ -1454,7 +1502,7 @@ async getMSG (msg_id) {
     this.bot.send(log)
 
     /** 等待响应 */
-    for (let i = 0; i < 12000; i++) {
+    for (let i = 0; i < 3600; i++) {
       const data = lain.echo[echo]
       if (data) {
         delete lain.echo[echo]
