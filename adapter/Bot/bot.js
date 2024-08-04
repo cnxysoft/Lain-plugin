@@ -6,7 +6,6 @@ import fetch from 'node-fetch'
 import crypto from 'crypto'
 import common from '../../lib/common/common.js'
 import Cfg from '../../lib/config/config.js'
-import { fileTypeFromBuffer } from 'file-type'
 import { Stream } from 'stream'
 
 /**
@@ -44,7 +43,7 @@ Bot.Buffer = async function (file, data) {
       return Buffer.from(await res.arrayBuffer())
     }
   } else {
-    throw new Error('传入的文件类型不符合规则，只接受url、buffer、file://路径或者base64编码的图片')
+    throw new Error('传入的文件类型不符合规则，只接受url、buffer、file://路径或��base64编码的图牄1�7')
   }
 }
 
@@ -57,7 +56,7 @@ Bot.Buffer = async function (file, data) {
   - { file:true } 原样返回file
   - { base:true } 原样返回Base
   - { buffer:true } 原样返回Buffer
- * @returns {Promise<string>} base64字符串
+ * @returns {Promise<string>} base64字符丄1�7
  */
 Bot.Base64 = async function (file, data) {
   if (Buffer.isBuffer(file) || file instanceof Uint8Array) {
@@ -83,17 +82,17 @@ Bot.Base64 = async function (file, data) {
       return Buffer.from(await res.arrayBuffer()).toString('base64')
     }
   } else {
-    throw new Error('传入的文件类型不符合规则，只接受url、buffer、file://路径或者base64编码的图片')
+    throw new Error('传入的文件类型不符合规则，只接受url、buffer、file://路径或��base64编码的图牄1�7')
   }
 }
 
 /**
  * 传入可读流，返回buffer、base64://
- * @param {ReadStream} file - 可读流
- * @param {object} data - 可选，默认返回buffer
+ * @param {ReadStream} file - 可读浄1�7
+ * @param {object} data - 可��，默认返回buffer
   - { buffer:true } 返回buffer
   - { base:true } 返回Base://
- * @returns {Promise<string|Buffer>} buffer或base64字符串
+ * @returns {Promise<string|Buffer>} buffer或base64字符丄1�7
  */
 Bot.Stream = async function (file, data) {
   return new Promise((resolve, reject) => {
@@ -108,12 +107,12 @@ Bot.Stream = async function (file, data) {
 * QQ图床
 * 支持http://、file://、base64://、buffer
 * @param file  * 处理传入的图片文件，转为url
-* @param uin botQQ 可选，未传入则调用Bot.uin
-* @returns {Promise<Object>} 包含以下属性的对象：
+* @param uin botQQ 可��，未传入则调用Bot.uin
+* @returns {Promise<Object>} 包含以下属��的对象＄1�7
 *   - {number} width - 图片宽度
 *   - {number} height - 图片高度
 *   - {string} url - QQ图床url
-*   - {string} md5 - 文件的MD5哈希值
+*   - {string} md5 - 文件的MD5哈希倄1�7
 */
 Bot.uploadQQ = async function (file, uin = Bot.uin) {
   uin = Number(uin)
@@ -132,13 +131,13 @@ Bot.uploadQQ = async function (file, uin = Bot.uin) {
 /**
 * 传入文件，转为服务器公网url
 * 可以是http://、file://、base64://、buffer
-* @param {string|Buffer} file - 传入的图片文件
-* @param {image|audio|video} type - 可选，不传为图片
-* @returns {Promise<Object>} 包含以下属性的对象：
+* @param {string|Buffer} file - 传入的图片文仄1�7
+* @param {image|audio|video} type - 可��，不传为图牄1�7
+* @returns {Promise<Object>} 包含以下属��的对象＄1�7
 *   - {number} width - 图片宽度
 *   - {number} height - 图片高度
 *   - {string} url - 服务器后的公网URL
-*   - {string} md5 - 文件的MD5哈希值
+*   - {string} md5 - 文件的MD5哈希倄1�7
 */
 Bot.FileToUrl = async function (file, type = 'image') {
   /** 转为buffer */
@@ -156,7 +155,7 @@ Bot.FileToUrl = async function (file, type = 'image') {
     size
   }
 
-  /** 图片需要计算多两个参数 */
+  /** 图片霢�要计算多两个参数 */
   if (type === 'image') {
     const { width, height } = sizeOf(buffer)
     File.width = width
@@ -174,7 +173,7 @@ Bot.FileToUrl = async function (file, type = 'image') {
       File.mime = mime
       File.type = ext
     } catch (error) {
-      logger.error('未知类型：', error)
+      logger.error('未知类型＄1�7', error)
       File.mime = 'application/octet-stream'
       File.type = 'txt'
     }
@@ -194,7 +193,7 @@ Bot.FileToUrl = async function (file, type = 'image') {
   /** 定时删除 */
   setTimeout(() => {
     lain.Files.delete(filename)
-    logger.debug(`[缓存清理] => [filename：${filename}]`)
+    logger.debug(`[缓存清理] => [filename＄1�7${filename}]`)
   }, (Cfg.Server.InvalidTime || 30) * 1000)
   /** 获取基本配置 */
   const { port, baseIP, baseUrl } = Cfg.Server
@@ -204,10 +203,10 @@ Bot.FileToUrl = async function (file, type = 'image') {
 }
 
 /**
-* 传入文件，返回本地路径
+* 传入文件，返回本地路径1�7
 * 可以是http://、file://、base64://、buffer
 * @param {file://|base64://|http://|buffer} file
-* @param {string} _path - 可选，不传默认为图片
+* @param {string} _path - 可��，不传默认为图牄1�7
 */
 Bot.FileToPath = async function (file, _path) {
   if (!_path) _path = `./temp/FileToUrl/${Date.now()}.png`
@@ -238,14 +237,14 @@ Bot.FileToPath = async function (file, _path) {
       return _path
     }
   } else {
-    throw new Error('传入的文件类型不符合规则，只接受url、buffer、file://路径或者base64编码的图片')
+    throw new Error('传入的文件类型不符合规则，只接受url、buffer、file://路径或��base64编码的图牄1�7')
   }
 }
 
 /**
-* 处理segment中的图片、语音、文件，获取对应的类型
-* @param i 需要处理的对象
-* 传入类似于 {type:"image", file:"file://...", url:"http://"}
+* 处理segment中的图片、语音��文件，获取对应的类垄1�7
+* @param i 霢�要处理的对象
+* 传入类似亄1�7 {type:"image", file:"file://...", url:"http://"}
 *
 * 返回 {type:<file|buffer|base64|http|error>, file=:<file://|buffer|base64://|http://|i.file>}
 *
@@ -265,7 +264,7 @@ Bot.toType = function (i) {
   let file
   let type = 'file'
 
-  // 检查是否是Buffer类型
+  // 棢�查是否是Buffer类型
   if (i?.type === 'Buffer') {
     type = 'buffer'
     file = Buffer.from(i?.data)
@@ -273,14 +272,14 @@ Bot.toType = function (i) {
     type = 'buffer'
     file = i?.data || i
   } else if (i instanceof fs.ReadStream || i?.path || i instanceof Stream.PassThrough ) {
-    // 检查是否是ReadStream类型
+    // 棢�查是否是ReadStream类型
     if (fs.existsSync(i.path)) {
       file = `file://${i.path}`
     } else {
       file = `file://./${i.path}`
     }
   } else if (typeof i === 'string') {
-    // 检查是否是字符串类型
+    // 棢�查是否是字符串类垄1�7
     if (fs.existsSync(i.replace(/^file:\/\//, ''))) {
       file = i
     } else if (fs.existsSync(i.replace(/^file:\/\/\//, ''))) {
@@ -288,7 +287,7 @@ Bot.toType = function (i) {
     } else if (fs.existsSync(i)) {
       file = `file://${i}`
     } else if (/^base64:\/\//.test(i)) {
-      // 检查是否是base64格式的字符串
+      // 棢�查是否是base64格式的字符串
       type = 'base64'
       file = i
     } else if (/^http(s)?:\/\//.test(i)) {
@@ -328,7 +327,7 @@ Bot.FormatFile = async function (file) {
 
   switch (typeof file) {
     case 'object':
-      /** 这里会有复读这样的直接原样不动把message发过来... */
+      /** 这里会有复读这样的直接原样不动把message发过杄1�7... */
       if (file.url) {
         if (file?.url?.includes('gchat.qpic.cn') && !file?.url?.startsWith('https://')) return `https://${file.url}`
         return file.url
@@ -338,7 +337,7 @@ Bot.FormatFile = async function (file) {
       if (file?.type === 'Buffer') return Buffer.from(file?.data)
       if (Buffer.isBuffer(file) || file instanceof Uint8Array) return file
 
-      /** 流 */
+      /** 浄1�7 */
       if (file instanceof fs.ReadStream || file instanceof Stream.PassThrough) return await Bot.Stream(file, { base: true })
 
       /** i.file */
@@ -352,9 +351,9 @@ Bot.FormatFile = async function (file) {
 }
 
 /**
-* 传入字符串 提取url 返回数组
+* 传入字符丄1�7 提取url 返回数组
 * @param {string} url 传入字符串，提取出所有url
-* @param {array} exclude - 可选，需使用请传入数组，数组内为排除的url，即不返回数组内相近的url
+* @param {array} exclude - 可��，霢�使用请传入数组，数组内为排除的url，即不返回数组内相近的url
 */
 Bot.getUrls = function (url, exclude = []) {
   if (!Array.isArray(exclude)) exclude = [exclude]
@@ -365,7 +364,7 @@ Bot.getUrls = function (url, exclude = []) {
     exclude,
     /** 去除 WWW */
     stripWWW: false,
-    /** 规范化协议 */
+    /** 规范化协讄1�7 */
     normalizeProtocol: false,
     /** 移除查询参数 */
     removeQueryParameters: false,
@@ -384,20 +383,20 @@ Bot.getUrls = function (url, exclude = []) {
 }
 
 /**
- * Bot.Button 是一个函数，用于生成按钮列表。
- * @param {Array} list - 包含按钮信息的数组。每个对象可以有以下属性：
- *   @param {string} text - 按钮的显示文本。
- *   @param {number} style - 按钮的显示的颜色，0-灰色，1-蓝色。
- *   @param {string} data - 按钮的自定义回复内容。
- *   @param {boolean} send - 如果为 true，则直接发送内容。
- *   @param {boolean} admin - 如果为 true，则仅管理员可以点击此按钮。
- *   @param {Array} list - 包含有权限点击此按钮的用户 id 的数组。
- *   @param {Array} role - 包含有权限点击此按钮的用户组 id 的数组（仅频道可用）。
- *   @param {boolean} reply - 如果为 true，则点击后自动添加引用回复。
- *   @param {string} link - 按钮的 http 跳转链接。
- *   以上参数，均可自行组合。
- * @param {number} [line=3] - 按钮的行数。
- * @returns {Array} button - 返回包含按钮信息的数组。
+ * Bot.Button 是一个函数，用于生成按钮列表〄1�7
+ * @param {Array} list - 包含按钮信息的数组��每个对象可以有以下属��：
+ *   @param {string} text - 按钮的显示文本��1�7
+ *   @param {number} style - 按钮的显示的颜色＄1�70-灰色＄1�71-蓝色〄1�7
+ *   @param {string} data - 按钮的自定义回复内容〄1�7
+ *   @param {boolean} send - 如果丄1�7 true，则直接发��内容��1�7
+ *   @param {boolean} admin - 如果丄1�7 true，则仅管理员可以点击此按钮��1�7
+ *   @param {Array} list - 包含有权限点击此按钮的用戄1�7 id 的数组��1�7
+ *   @param {Array} role - 包含有权限点击此按钮的用户组 id 的数组（仅频道可用）〄1�7
+ *   @param {boolean} reply - 如果丄1�7 true，则点击后自动添加引用回复��1�7
+ *   @param {string} link - 按钮的1�7 http 跳转链接〄1�7
+ *   以上参数，均可自行组合��1�7
+ * @param {number} [line=3] - 按钮的行数��1�7
+ * @returns {Array} button - 返回包含按钮信息的数组��1�7
  */
 Bot.Button = function (list, line = 3) {
   let id = 0
@@ -470,16 +469,16 @@ Bot.Button = function (list, line = 3) {
   return button
 }
 
-/** 转换文本中的URL为图片 */
+/** 转换文本中的URL为图牄1�7 */
 Bot.HandleURL = async function (msg) {
   const message = []
   if (msg?.text) msg = msg.text
-  /** 需要处理的url */
+  /** 霢�要处理的url */
   let urls = Bot.getUrls(msg, Cfg.WhiteLink)
 
   let promises = urls.map(link => {
     return new Promise((resolve, reject) => {
-      common.mark('Lain-plugin', `url替换：${link}`)
+      common.mark('Lain-plugin', `url替换＄1�7${link}`)
       QrCode.toBuffer(link, {
         errorCorrectionLevel: 'H',
         type: 'png',
@@ -490,9 +489,9 @@ Bot.HandleURL = async function (msg) {
         const base64 = 'base64://' + buffer.toString('base64')
         const file = await common.Rending({ base64, link }, 'QRCode/QRCode')
         message.push({ type: 'image', file })
-        msg = msg.replace(link, '[链接(请扫码查看)]')
-        msg = msg.replace(link.replace(/^http:\/\//g, ''), '[链接(请扫码查看)]')
-        msg = msg.replace(link.replace(/^https:\/\//g, ''), '[链接(请扫码查看)]')
+        msg = msg.replace(link, '[链接(请扫码查眄1�7)]')
+        msg = msg.replace(link.replace(/^http:\/\//g, ''), '[链接(请扫码查眄1�7)]')
+        msg = msg.replace(link.replace(/^https:\/\//g, ''), '[链接(请扫码查眄1�7)]')
         resolve()
       })
     })
