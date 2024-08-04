@@ -1,15 +1,14 @@
 import { randomUUID } from 'crypto'
 import { WebSocketServer } from 'ws'
-import { fileTypeFromBuffer } from 'file-type'
 import common from '../../lib/common/common.js'
 import Cfg from '../../lib/config/config.js'
 
 class AdapterComWeChat {
-  /** ä¼ å…¥åŸºæœ¬é…ç½® */
+  /** ´«Èë»ù±¾ÅäÖÃ */
   constructor (bot, request) {
-    /** å­˜ä¸€ä¸‹ */
+    /** ´æÒ»ÏÂ */
     bot.request = request
-    /** è¿æ¥key */
+    /** Á¬½Ókey */
     this.key = request.headers['sec-websocket-key']
     /** OneBot */
     this.OneBot = request.headers['user-agent']
@@ -17,114 +16,114 @@ class AdapterComWeChat {
     this.host = request.headers.host
     /** ws */
     this.bot = bot
-    /** ç›‘å¬äº‹ä»¶ */
+    /** ¼àÌıÊÂ¼ş */
     this.bot.on('message', (data) => this.event(data))
-    /** ç›‘å¬è¿æ¥å…³é—­äº‹ä»¶ */
-    bot.on('close', () => lain.error('Lain-plugin', `<Bot:${this.OneBot}><host:${this.host}> åå‘WebSocketè¿æ¥å·²æ–­å¼€`))
-    lain.info('Lain-plugin', `<Bot:${this.OneBot}><host:${this.host}> æ”¶åˆ°åå‘WebSocketè¿æ¥`)
+    /** ¼àÌıÁ¬½Ó¹Ø±ÕÊÂ¼ş */
+    bot.on('close', () => lain.error('Lain-plugin', `<Bot:${this.OneBot}><host:${this.host}> ·´ÏòWebSocketÁ¬½ÓÒÑ¶Ï¿ª`))
+    lain.info('Lain-plugin', `<Bot:${this.OneBot}><host:${this.host}> ÊÕµ½·´ÏòWebSocketÁ¬½Ó`)
   }
 
-  /** å¤„ç†ç›‘å¬äº‹ä»¶ */
+  /** ´¦Àí¼àÌıÊÂ¼ş */
   async event (data) {
     lain.debug('Lain-plugin', `ws => ${data}`)
     data = JSON.parse(data)
-    /** å¸¦echoçš„å±äºä¸»åŠ¨è¯·æ±‚çš„å“åº”ï¼Œå¦å¤–ä¿å­˜ */
+    /** ´øechoµÄÊôÓÚÖ÷¶¯ÇëÇóµÄÏìÓ¦£¬ÁíÍâ±£´æ */
     if (data?.echo) return lain.echo.set(data.echo, data)
 
     this[data.type](data)
   }
 
-  /** å…ƒäº‹ä»¶ */
+  /** ÔªÊÂ¼ş */
   async meta (data) {
-    /** å¤„ç†äº‹ä»¶ */
+    /** ´¦ÀíÊÂ¼ş */
     switch (data.detail_type) {
-      /** è¿æ¥å»ºç«‹æˆåŠŸ */
+      /** Á¬½Ó½¨Á¢³É¹¦ */
       case 'connect':
-        lain.info('Lain-plugin', `<Bot:${this.OneBot}><host:${this.host}> åå‘WebSocketè¿æ¥å»ºç«‹æˆåŠŸ`)
+        lain.info('Lain-plugin', `<Bot:${this.OneBot}><host:${this.host}> ·´ÏòWebSocketÁ¬½Ó½¨Á¢³É¹¦`)
         break
-      /** å¿ƒè·³ */
+      /** ĞÄÌø */
       case 'heartbeat':
-        lain.debug('Lain-plugin', `<Bot:${this.OneBot}><host:${this.host}> å¿ƒè·³ï¼š${JSON.stringify(data)}`)
+        lain.debug('Lain-plugin', `<Bot:${this.OneBot}><host:${this.host}> ĞÄÌø£º${JSON.stringify(data)}`)
         break
-      /** çŠ¶æ€æ›´æ–° */
+      /** ×´Ì¬¸üĞÂ */
       case 'status_update':
         this.id = data.status.bots[0].self.user_id
-        /** å…¼å®¹æ—§ç‰ˆæœ¬ */
+        /** ¼æÈİ¾É°æ±¾ */
         Bot.lain.wc = this.bot
         Bot.lain.wc.uin = this.id
         await this.LoadBot()
         break
-      /** æœªçŸ¥äº‹ä»¶ */
+      /** Î´ÖªÊÂ¼ş */
       default:
-        lain.error('Lain-plugin', `<Bot:${this.OneBot}><host:${this.host}> æœªçŸ¥äº‹ä»¶ï¼š${JSON.stringify(data)}`)
+        lain.error('Lain-plugin', `<Bot:${this.OneBot}><host:${this.host}> Î´ÖªÊÂ¼ş£º${JSON.stringify(data)}`)
         break
     }
   }
 
-  /** æ¶ˆæ¯äº‹ä»¶ */
+  /** ÏûÏ¢ÊÂ¼ş */
   async message (data) {
-    /** å¤„ç†äº‹ä»¶ */
+    /** ´¦ÀíÊÂ¼ş */
     switch (data.detail_type) {
-      /** ç§èŠæ¶ˆæ¯äº‹ä»¶ */
+      /** Ë½ÁÄÏûÏ¢ÊÂ¼ş */
       case 'private':
-        /** è½¬ç½®æ¶ˆæ¯åç»™å–µå´½ */
+        /** ×ªÖÃÏûÏ¢ºó¸øß÷áÌ */
         return await Bot.emit('message', await this.ICQQMessage(data))
-      /** ç¾¤èŠæ¶ˆæ¯äº‹ä»¶ */
+      /** ÈºÁÄÏûÏ¢ÊÂ¼ş */
       case 'group':
-        /** è½¬ç½®æ¶ˆæ¯åç»™å–µå´½ */
+        /** ×ªÖÃÏûÏ¢ºó¸øß÷áÌ */
         return await Bot.emit('message', await this.ICQQMessage(data))
-      /** æœªçŸ¥äº‹ä»¶ */
+      /** Î´ÖªÊÂ¼ş */
       default:
-        lain.error('Lain-plugin', `<Bot:${this.OneBot}><host:${this.host}> æœªçŸ¥äº‹ä»¶ï¼š${JSON.stringify(data)}`)
+        lain.error('Lain-plugin', `<Bot:${this.OneBot}><host:${this.host}> Î´ÖªÊÂ¼ş£º${JSON.stringify(data)}`)
         break
     }
   }
 
-  /** è¯·æ±‚äº‹ä»¶ */
+  /** ÇëÇóÊÂ¼ş */
   async request (data) {
-    /** å¤„ç†äº‹ä»¶ */
+    /** ´¦ÀíÊÂ¼ş */
     switch (data.detail_type) {
-      /** æ·»åŠ å¥½å‹è¯·æ±‚ */
+      /** Ìí¼ÓºÃÓÑÇëÇó */
       case 'wx.friend_request':
         if (Cfg.Other.ComWeChat.autoFriend) {
           const { v3, v4, nickname, user_id } = data
           await this.sendApi('wx.accept_friend', { v3, v4 })
-          lain.info(this.id, `è‡ªåŠ¨åŒæ„å¥½å‹ç”³è¯·ï¼š${nickname}(${user_id})`)
+          lain.info(this.id, `×Ô¶¯Í¬ÒâºÃÓÑÉêÇë£º${nickname}(${user_id})`)
         } else {
           const { v3, v4, nickname, user_id } = data
-          lain.info(this.id, `<å¥½å‹ç”³è¯·:${nickname}(${user_id})><v3:${v3}><v4:${v4}>`)
+          lain.info(this.id, `<ºÃÓÑÉêÇë:${nickname}(${user_id})><v3:${v3}><v4:${v4}>`)
         }
         break
-      /** æœªçŸ¥äº‹ä»¶ */
+      /** Î´ÖªÊÂ¼ş */
       default:
-        lain.error('Lain-plugin', `<Bot:${this.OneBot}><host:${this.host}> æœªçŸ¥äº‹ä»¶ï¼š${JSON.stringify(data)}`)
+        lain.error('Lain-plugin', `<Bot:${this.OneBot}><host:${this.host}> Î´ÖªÊÂ¼ş£º${JSON.stringify(data)}`)
         break
     }
   }
 
-  /** é€šçŸ¥äº‹ä»¶ */
+  /** Í¨ÖªÊÂ¼ş */
   async notice (data) {
-    /** å¤„ç†äº‹ä»¶ */
+    /** ´¦ÀíÊÂ¼ş */
     switch (data.detail_type) {
-      /** ç§èŠæ‹ä¸€æ‹ */
+      /** Ë½ÁÄÅÄÒ»ÅÄ */
       case 'wx.get_private_poke':
-        /** è½¬ç½®æ¶ˆæ¯åç»™å–µå´½ */
+        /** ×ªÖÃÏûÏ¢ºó¸øß÷áÌ */
         return await Bot.emit('notice', await this.ICQQMessage(data))
-      /** ç¾¤èŠæ‹ä¸€æ‹ */
+      /** ÈºÁÄÅÄÒ»ÅÄ */
       case 'wx.get_group_poke':
-        /** è½¬ç½®æ¶ˆæ¯åç»™å–µå´½ */
+        /** ×ªÖÃÏûÏ¢ºó¸øß÷áÌ */
         return await Bot.emit('notice', await this.ICQQMessage(data))
-      /** æœªçŸ¥äº‹ä»¶ */
+      /** Î´ÖªÊÂ¼ş */
       default:
-        lain.mark('Lain-plugin', `<Bot:${this.OneBot}><host:${this.host}> æœªçŸ¥äº‹ä»¶ï¼š${JSON.stringify(data)}`)
+        lain.mark('Lain-plugin', `<Bot:${this.OneBot}><host:${this.host}> Î´ÖªÊÂ¼ş£º${JSON.stringify(data)}`)
         break
     }
   }
 
-  /** æ³¨å†ŒBot */
+  /** ×¢²áBot */
   async LoadBot () {
     const data = await this.sendApi('get_self_info', {})
-    /** æ„å»ºåŸºæœ¬å‚æ•° */
+    /** ¹¹½¨»ù±¾²ÎÊı */
     Bot[this.id] = {
       ws: this.bot,
       fl: new Map(),
@@ -160,39 +159,39 @@ class AdapterComWeChat {
       readMsg: async () => common.recvMsg(this.id, 'ComWeChat', true),
       MsgTotal: async (type) => common.MsgTotal(this.id, 'ComWeChat', type, true)
     }
-    /** é‡å¯ */
+    /** ÖØÆô */
     await common.init('Lain:restart:ComWeChat')
     await this.loadRes()
-    /** ä¿å­˜uin */
+    /** ±£´æuin */
     if (!Bot.adapter.includes(this.id)) Bot.adapter.push(this.id)
   }
 
-  /** åŠ è½½èµ„æº */
+  /** ¼ÓÔØ×ÊÔ´ */
   async loadRes () {
-    /** è·å–ç¾¤èŠåˆ—è¡¨å•¦~ */
+    /** »ñÈ¡ÈºÁÄÁĞ±íÀ²~ */
     const group_list = await this.sendApi('get_group_list', {})
 
     for (const i of group_list) {
       i.uin = this.id
-      /** ç»™é”…å·´ç”¨ */
+      /** ¸ø¹ø°ÍÓÃ */
       Bot.gl.set(i.group_id, i)
-      /** è‡ªèº«å‚æ•° */
+      /** ×ÔÉí²ÎÊı */
       Bot[this.id].gl.set(i.group_id, i)
     }
 
-    /** å¾®ä¿¡å¥½å‹åˆ—è¡¨ */
+    /** Î¢ĞÅºÃÓÑÁĞ±í */
     const friend_list = await this.sendApi('get_friend_list', {})
     for (const i of friend_list) {
       i.uin = this.id
-      /** ç»™é”…å·´ç”¨ */
+      /** ¸ø¹ø°ÍÓÃ */
       Bot.fl.set(i.user_id, i)
-      /** è‡ªèº«å‚æ•° */
+      /** ×ÔÉí²ÎÊı */
       Bot[this.id].fl.set(i.user_id, i)
     }
-    lain.info('Lain-plugin', `<Bot:${this.OneBot}><host:${this.host}> åŠ è½½äº†${Bot[this.id].fl.size}ä¸ªå¥½å‹ï¼Œ${Bot[this.id].gl.size}ä¸ªç¾¤èŠ`)
+    lain.info('Lain-plugin', `<Bot:${this.OneBot}><host:${this.host}> ¼ÓÔØÁË${Bot[this.id].fl.size}¸öºÃÓÑ£¬${Bot[this.id].gl.size}¸öÈºÁÄ`)
   }
 
-  /** å‘é€è¯·æ±‚ */
+  /** ·¢ËÍÇëÇó */
   async sendApi (action, params) {
     const echo = randomUUID()
     lain.debug(this.id, '[ws] send -> ' + JSON.stringify({ echo, action, params }))
@@ -215,39 +214,39 @@ class AdapterComWeChat {
     const json = {
       status: 'failed',
       retcode: -1,
-      wording: 'è·å–è¶…æ—¶',
+      wording: '»ñÈ¡³¬Ê±',
       echo
     }
     throw json
   }
 
-  /** æ¶ˆæ¯è½¬æ¢ä¸ºICQQæ ¼å¼ */
+  /** ÏûÏ¢×ª»»ÎªICQQ¸ñÊ½ */
   async ICQQMessage (data) {
     if (!data.message) data.message = [{ type: 'poke', data: { id: '' } }]
     let { message, ToString, raw_message, log_message } = await this.getMessage(data.message)
 
-    /** ç§èŠæ‹ä¸€æ‹ éœ€è¦æå‰å¤„ç†ï¼Œå¦åˆ™ä¼šå¯¼è‡´user_idé”™è¯¯ */
+    /** Ë½ÁÄÅÄÒ»ÅÄ ĞèÒªÌáÇ°´¦Àí£¬·ñÔò»áµ¼ÖÂuser_id´íÎó */
     if (data.detail_type === 'wx.get_private_poke') {
       data.target_id = data.user_id
       data.operator_id = data.from_user_id
       data.user_id = data.from_user_id
-      data.action = 'æˆ³äº†æˆ³'
-      log_message = `${data.operator_id} æˆ³äº†æˆ³ ${data.target_id}`
+      data.action = '´ÁÁË´Á'
+      log_message = `${data.operator_id} ´ÁÁË´Á ${data.target_id}`
       message = null
     }
-    /** ç¾¤èŠæ‹ä¸€æ‹ */
+    /** ÈºÁÄÅÄÒ»ÅÄ */
     if (data.detail_type === 'wx.get_group_poke') {
-      data.action = 'æˆ³äº†æˆ³'
+      data.action = '´ÁÁË´Á'
       data.target_id = data.user_id
       data.operator_id = data.from_user_id
-      log_message = `${data.operator_id} æˆ³äº†æˆ³ ${data.target_id}`
+      log_message = `${data.operator_id} ´ÁÁË´Á ${data.target_id}`
       message = null
     }
 
     const { group_id, detail_type, message_id, user_id } = data
     const sub_type = /^private$|^wx.get_private_poke$/.test(detail_type) ? 'friend' : 'normal'
 
-    /** è·å–ç”¨æˆ·åç§° */
+    /** »ñÈ¡ÓÃ»§Ãû³Æ */
     let user_name
     if (sub_type === 'friend') {
       const data = await this.sendApi('get_user_info', { user_id })
@@ -289,23 +288,23 @@ class AdapterComWeChat {
 
     if (detail_type === 'private' || detail_type === 'wx.get_private_poke') {
       data.friend = {
-        recallMsg: () => 'æš‚æœªæ”¯æŒ',
+        recallMsg: () => 'ÔİÎ´Ö§³Ö',
         makeForwardMsg: async (forwardMsg) => await common.makeForwardMsg(forwardMsg),
-        getChatHistory: () => 'æš‚æœªæ”¯æŒ',
+        getChatHistory: () => 'ÔİÎ´Ö§³Ö',
         sendMsg: async (msg) => await this.sendFriendMsg(msg)
       }
-      lain.info(this.id, `<å¥½å‹:${user_id}> -> ${log_message}`)
+      lain.info(this.id, `<ºÃÓÑ:${user_id}> -> ${log_message}`)
     } else {
       data.group = {
-        getChatHistory: (seq, num) => 'æš‚æœªæ”¯æŒ',
-        recallMsg: () => 'æš‚æœªæ”¯æŒ',
+        getChatHistory: (seq, num) => 'ÔİÎ´Ö§³Ö',
+        recallMsg: () => 'ÔİÎ´Ö§³Ö',
         sendMsg: async (msg) => await this.sendGroupMsg(msg),
         makeForwardMsg: async (forwardMsg) => await common.makeForwardMsg(forwardMsg),
         pickMember: async (id) => await this.pickMember(group_id, id)
       }
-      lain.info(this.id, `<ç¾¤:${group_id}><ç”¨æˆ·:${user_id}> -> ${log_message}`)
+      lain.info(this.id, `<Èº:${group_id}><ÓÃ»§:${user_id}> -> ${log_message}`)
     }
-    data.recall = () => 'æš‚æœªæ”¯æŒ'
+    data.recall = () => 'ÔİÎ´Ö§³Ö'
     data.reply = async (msg) => group_id ? await this.sendGroupMsg(group_id, msg) : await this.sendFriendMsg(user_id, msg)
 
     if (data.detail_type === 'wx.get_private_poke') {
@@ -313,19 +312,19 @@ class AdapterComWeChat {
       data.post_type = 'notice'
       data.notice_type = 'private'
     }
-    /** ç¾¤èŠæ‹ä¸€æ‹ */
+    /** ÈºÁÄÅÄÒ»ÅÄ */
     if (data.detail_type === 'wx.get_group_poke') {
       data.sub_type = 'poke'
       data.post_type = 'notice'
       data.notice_type = 'group'
     }
 
-    /** ä¿å­˜æ¶ˆæ¯æ¬¡æ•° */
+    /** ±£´æÏûÏ¢´ÎÊı */
     try { common.recvMsg(this.id, data.adapter) } catch { }
     return data
   }
 
-  /** æ„å»ºmessage */
+  /** ¹¹½¨message */
   async getMessage (msg) {
     let message = []
     let ToString = []
@@ -350,20 +349,20 @@ class AdapterComWeChat {
         case 'mention_all':
           message.push({ type: 'text', qq: 'all', id: 'all' })
           raw_message.push('@all')
-          log_message.push('<@:å…¨ä½“æˆå‘˜>')
+          log_message.push('<@:È«Ìå³ÉÔ±>')
           ToString.push('{at:all}')
           break
         case 'image':
           try {
             const image = await this.sendApi('get_file', { type: 'url', file_id: i.data.file_id })
             message.push({ type: 'image', ...i.data, file: image.name, url: image.url })
-            raw_message.push('[å›¾ç‰‡]')
-            log_message.push(`<å›¾ç‰‡:${image.url}>`)
+            raw_message.push('[Í¼Æ¬]')
+            log_message.push(`<Í¼Æ¬:${image.url}>`)
             ToString.push(`{image:${image.url}}`)
           } catch {
             message.push({ type: 'image', file: i.data.file_id, url: i.data.file_id })
-            raw_message.push('[å›¾ç‰‡]')
-            log_message.push(`<å›¾ç‰‡:${i.data.file_id}>`)
+            raw_message.push('[Í¼Æ¬]')
+            log_message.push(`<Í¼Æ¬:${i.data.file_id}>`)
             ToString.push(`{image:${i.data.file_id}}`)
           }
           break
@@ -412,7 +411,7 @@ class AdapterComWeChat {
     }
   }
 
-  /** å‘å¥½å‹æ¶ˆæ¯ */
+  /** ·¢ºÃÓÑÏûÏ¢ */
   async sendFriendMsg (user_id, data) {
     const { message, raw_message } = await this.ComWeChatMessage(data, true)
     const params = {
@@ -420,11 +419,11 @@ class AdapterComWeChat {
       message,
       detail_type: 'private'
     }
-    lain.info(this.id, `<å‘å¥½å‹:${user_id}> => ${raw_message}`)
+    lain.info(this.id, `<·¢ºÃÓÑ:${user_id}> => ${raw_message}`)
     return await this.sendApi('send_message', params)
   }
 
-  /** å‘ç¾¤èŠæ¶ˆæ¯ */
+  /** ·¢ÈºÁÄÏûÏ¢ */
   async sendGroupMsg (group_id, data) {
     const { message, raw_message } = await this.ComWeChatMessage(data)
     const params = {
@@ -432,17 +431,17 @@ class AdapterComWeChat {
       message,
       detail_type: 'group'
     }
-    lain.info(this.id, `<å‘é€ç¾¤èŠ:${group_id}> => ${raw_message}`)
+    lain.info(this.id, `<·¢ËÍÈºÁÄ:${group_id}> => ${raw_message}`)
     return await this.sendApi('send_message', params)
   }
 
-  /** è½¬æ¢ä¸ºComWeChatèƒ½ä½¿ç”¨çš„æ ¼å¼ */
+  /** ×ª»»ÎªComWeChatÄÜÊ¹ÓÃµÄ¸ñÊ½ */
   async ComWeChatMessage (data, friend) {
-    /** æ ‡å‡†åŒ–æ¶ˆæ¯å†…å®¹ */
+    /** ±ê×¼»¯ÏûÏ¢ÄÚÈİ */
     data = common.array(data)
-    /** ä¿å­˜ Shamrockæ ‡å‡† message */
+    /** ±£´æ Shamrock±ê×¼ message */
     let message = []
-    /** æ‰“å°çš„æ—¥å¿— */
+    /** ´òÓ¡µÄÈÕÖ¾ */
     let raw_message = []
 
     /** chatgpt-plugin */
@@ -468,31 +467,31 @@ class AdapterComWeChat {
           try {
             const data = await this.get_file_id('file', i.file)
             message.push(data)
-            raw_message.push(`<æ–‡ä»¶:${data.data.file_id}>`)
+            raw_message.push(`<ÎÄ¼ş:${data.data.file_id}>`)
           } catch {
             const data = await this.get_file_id('file', i.file)
             message.push(data)
-            raw_message.push(`<æ–‡ä»¶:${data.data.file_id}>`)
+            raw_message.push(`<ÎÄ¼ş:${data.data.file_id}>`)
           }
           break
         case 'image':
           try {
             if (i.file_id) {
               message.push({ type: 'image', data: { file_id: i.file_id } })
-              raw_message.push(`<å›¾ç‰‡:${i.file_id}>`)
+              raw_message.push(`<Í¼Æ¬:${i.file_id}>`)
             } else {
               const data = await this.get_file_id('image', i.file)
               message.push(data)
-              raw_message.push(`<å›¾ç‰‡:${data.data.file_id}>`)
+              raw_message.push(`<Í¼Æ¬:${data.data.file_id}>`)
             }
           } catch {
             message.push(await this.get_file_id('image', i.file))
-            raw_message.push(`<å›¾ç‰‡:${data.data.file_id}>`)
+            raw_message.push(`<Í¼Æ¬:${data.data.file_id}>`)
           }
           break
         case 'face':
         default:
-          // ä¸ºäº†å…¼å®¹æ›´å¤šå­—æ®µï¼Œä¸å†è¿›è¡Œåºåˆ—åŒ–ï¼Œé£é™©æ˜¯æœ‰å¯èƒ½æœªçŸ¥å­—æ®µå¯¼è‡´Shamrockå´©æºƒ
+          // ÎªÁË¼æÈİ¸ü¶à×Ö¶Î£¬²»ÔÙ½øĞĞĞòÁĞ»¯£¬·çÏÕÊÇÓĞ¿ÉÄÜÎ´Öª×Ö¶Îµ¼ÖÂShamrock±ÀÀ£
           message.push({ type: i.type, data: { text: JSON.stringify(i.data) } })
           raw_message.push(`[${i.type}:${JSON.stringify(i.data)}]`)
           break
@@ -502,7 +501,7 @@ class AdapterComWeChat {
     return { message, raw_message }
   }
 
-  /** ä¸Šä¼ æ–‡ä»¶ã€å›¾ç‰‡ */
+  /** ÉÏ´«ÎÄ¼ş¡¢Í¼Æ¬ */
   async get_file_id (type, i) {
     const file = await Bot.Base64(i)
     const buffer = await Bot.Buffer(`base64://${file}`)
@@ -515,7 +514,7 @@ class AdapterComWeChat {
 
     if (!file_id) return false
 
-    /** ç‰¹æ®Šå¤„ç†è¡¨æƒ…åŒ… */
+    /** ÌØÊâ´¦Àí±íÇé°ü */
     if (/.gif$/.test(name)) {
       return { type: 'wx.emoji', data: { file_id } }
     } else {
@@ -523,21 +522,21 @@ class AdapterComWeChat {
     }
   }
 
-  /** ç¾¤å¯¹è±¡ */
+  /** Èº¶ÔÏó */
   pickGroup (group_id) {
     return {
       is_admin: false,
       is_owner: false,
-      /** å‘é€æ¶ˆæ¯ */
+      /** ·¢ËÍÏûÏ¢ */
       sendMsg: async (msg) => await this.sendGroupMsg(group_id, msg),
       recallMsg: async () => '',
-      /** åˆ¶ä½œè½¬å‘ */
+      /** ÖÆ×÷×ª·¢ */
       makeForwardMsg: async (message) => await this.makeForwardMsg(message),
       sendFile: async (filePath) => await this.get_file_id('file', filePath)
     }
   }
 
-  /** å¥½å‹å¯¹è±¡ */
+  /** ºÃÓÑ¶ÔÏó */
   pickFriend (user_id) {
     return {
       sendMsg: async (msg) => await this.sendFriendMsg(user_id, msg),
@@ -548,7 +547,7 @@ class AdapterComWeChat {
     }
   }
 
-  /** ç¾¤æˆå‘˜åˆ—è¡¨ */
+  /** Èº³ÉÔ±ÁĞ±í */
   async getMemberMap (group_id) {
     return await this.sendApi('get_group_list', { group_id })
   }
@@ -558,15 +557,15 @@ class AdapterComWeChat {
   }
 }
 
-/** ComWeChatçš„WebSocketæœåŠ¡å™¨å®ä¾‹ */
+/** ComWeChatµÄWebSocket·şÎñÆ÷ÊµÀı */
 const ComWeChat = new WebSocketServer({ noServer: true })
 
-/** è¿æ¥ */
+/** Á¬½Ó */
 ComWeChat.on('connection', async (bot, request) => new AdapterComWeChat(bot, request))
 
-/** æ•è·é”™è¯¯ */
+/** ²¶»ñ´íÎó */
 ComWeChat.on('error', async error => logger.error(error))
 
 export default ComWeChat
 
-lain.info('Lain-plugin', 'ComWeChaté€‚é…å™¨åŠ è½½å®Œæˆ')
+lain.info('Lain-plugin', 'ComWeChatÊÊÅäÆ÷¼ÓÔØÍê³É')
