@@ -786,16 +786,12 @@ class OneBotv11Core {
     if (msg.length) {
       for (let i of msg) {
         try {
-          let { message: content } = await this.getOneBotv11Core(i)
-          if (content[0].type == "node") {
-            for (let ii of content) {
-              for (let iii of ii.data?.data?.content || ii.data?.content) {
-                content = iii
-              }
-            }
+          const { message: content } = await this.getOneBotv11Core(i)
+          if (content[0].type === 'node') {
+            makeForwardMsg.message.push(...content)
+          } else {
+            makeForwardMsg.message.push({ type: 'node', data: {type: 'node', data: { name: this.nickname || 'OneBotv11', uin: String(this.id), content }}})
           }
-          makeForwardMsg.message.push({ type: 'node', data: {type: 'node', data: { name: this.nickname || 'OneBotv11', uin: String(this.id), content }}})
-          // const id = await this.sendApi('send_forward_msg', { user_id: String(this.id), messages: [{ type: 'node', data: { name: this.nickname || 'OneBotv11', uin: String(this.id), content } }] })
         } catch (err) {
           common.error(this.id, err)
         }
