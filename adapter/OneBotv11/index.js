@@ -200,8 +200,8 @@ class OneBotv11Core {
       case 'notify':
         switch (data.sub_type) {
           case 'poke': {
-            let action = data.poke_detail?.action || '戳了戳'
-            let suffix = data.poke_detail?.suffix || ''
+            let action = data.poke_detail?.action ?? data.raw_info[2]?.txt ?? (data.raw_info[1]?.type == 'img' ? '特效' : null) ?? '戳了戳'
+            let suffix = data.poke_detail?.suffix ?? data.raw_info[4]?.txt ?? data.raw_info[3]?.txt ?? ''
             common.info(this.id, `[${data.user_id}]${action}[${data.target_id}]${suffix}`)
             break
           }
@@ -869,8 +869,9 @@ class OneBotv11Core {
     /** 通知事件 */
     const noticePostType = async function () {
       if (e.sub_type === 'poke') {
-        e.action = e.poke_detail?.action || '戳了戳'
-        e.raw_message = `${e.user_id} ${e.action} ${e.target_id}`
+        e.action = e.poke_detail?.action ?? e.raw_info[2]?.txt ?? (e.raw_info[1]?.type == 'img' ? '特效' : null) ?? '戳了戳'
+        e.suffix = e.poke_detail?.suffix ?? e.raw_info[4]?.txt ?? e.raw_info[3]?.txt ?? ''
+        e.raw_message = `${e.user_id} ${e.action} ${e.target_id} ${e.suffix}`
       }
 
       if (e.group_id) {
@@ -879,7 +880,7 @@ class OneBotv11Core {
         let fl = await Bot[this.id].api.get_stranger_info(Number(e.user_id))
         e.member = {
           ...fl,
-          card: fl?.nickname,
+          card: e.group.pickMember(e.user_id)?.card,
           nickname: fl?.nickname
         }
       } else {
