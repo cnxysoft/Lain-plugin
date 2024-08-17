@@ -62,7 +62,7 @@ Bot.Buffer = async function (file, data) {
 Bot.Base64 = async function (file, data) {
   if (Buffer.isBuffer(file) || file instanceof Uint8Array) {
     if (data?.buffer) return file
-    return file.toString('base64')
+    return Buffer.from(file).toString('base64')
   } else if (file instanceof fs.ReadStream || file instanceof Stream.PassThrough) {
     return await Bot.Stream(file, { base: true })
   } else if (fs.existsSync(file.replace(/^file:\/\//, ''))) {
