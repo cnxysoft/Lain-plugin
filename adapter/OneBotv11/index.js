@@ -458,15 +458,11 @@ class OneBotv11Core {
 
   /** 设置头像 */
   async setAvatar (imgPath, groupId) {
-    let setAvatarApi = "set_qq_avatar"
-    const param = {
-      file: imgPath,
-      groupCode: groupId ? groupId.toString() : null
-    }
     if (groupId) {
-      setAvatarApi = "set_group_head"
+      return await api.set_group_portrait(this.id, groupId, imgPath)
+    } else {
+      return await api.set_qq_avatar(this.id, imgPath)
     }
-    return await api.SendApi(this.id, setAvatarApi, param)
   }
 
   /** 群列表 */

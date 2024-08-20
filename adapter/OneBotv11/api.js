@@ -61,6 +61,16 @@ let api = {
   },
 
   /**
+  * 设置 QQ 头像 (非标准API / NapCat)
+  * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
+  * @param {string} file - 头像图片（支持 base64、文件路径、URL）
+  */
+  async set_qq_avatar (id, file) {
+    const params = { file }
+    return await this.SendApi(id, 'set_qq_avatar', params)
+  },
+
+  /**
   * 获取陌生人信息
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   * @param {string} user_id - 陌生人QQ
