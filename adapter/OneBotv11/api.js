@@ -54,9 +54,10 @@ let api = {
   * @param {string} personal_note - 个人备注
   * @param {number} [age] - 年龄 (可选)
   * @param {string} [birthday] - 生日 (格式：YYYY-MM-DD) (可选)
+  * @param {number} sex - 性别 (格式：0无/1男性/2女性) (可选)
   */
-  async set_qq_profile (id, nickname, company, email, college, personal_note, age, birthday) {
-    const params = { nickname, company, email, college, personal_note, age, birthday }
+  async set_qq_profile (id, nickname, company, email, college, personal_note, age, birthday, sex) {
+    const params = { nickname, company, email, college, personal_note, age, birthday, sex }
     return await this.SendApi(id, 'set_qq_profile', params)
   },
 
@@ -788,7 +789,7 @@ let api = {
     Bot[id].ws.send(log)
 
     /** 等待响应 */
-    for (let i = 0; i < 3600; i++) {
+    for (let i = 0; i < 2400; i++) {
       const data = lain.echo[echo]
       if (data) {
         delete lain.echo[echo]

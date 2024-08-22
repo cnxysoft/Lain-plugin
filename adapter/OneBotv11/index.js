@@ -92,6 +92,18 @@ class OneBotv11Core {
       }
     })().catch(common.error)
     switch (data.notice_type) {
+      case 'group_msg_emoji_like':
+        data.notice_type = 'group'
+        data.sub_type = "msg_emoji_like"
+        common.info(this.id, `群消息回应：[${data.group_id}]${data.user_id} 对消息 ${data.message_id} 点了 ${data.likes[0].count} 个 <${faceMap[Number(data.likes[0].emoji_id)]}>`)
+        break
+      case 'essence':
+        data.notice_type = 'group'
+        data.set = data.sub_type === 'add'
+        data.sub_type = "essence"
+        data.user_id = data.user_id || data.sender_id || data.self_id
+        common.info(this.id, `群精华设置：[${data.group_id}]${data.user_id} 的消息 ${data.message_id} 被设为精华`)
+        break
       case 'group_recall':
         try {
           let gl = Bot[this.id].gl.get(data.group_id)
@@ -363,6 +375,9 @@ class OneBotv11Core {
       readMsg: async () => common.recvMsg(this.id, 'OneBotv11', true),
       MsgTotal: async (type) => common.MsgTotal(this.id, 'OneBotv11', type, true),
       setAvatar: async (imgPath) => await this.setAvatar(String(imgPath)),
+      setNickname: async (name) => await this.setQQProfile(name),
+      setGender: async (gender) => await this.setQQProfile({sex: gender}),
+      setSignature: async (signature) => await this.setQQProfile({personal_note: signature}),
       api: new Proxy(api, {
         get: (target, prop) => {
           try {
@@ -454,6 +469,12 @@ class OneBotv11Core {
     const log = `OneBotv11加载资源成功：加载了${Bot[this.id].fl.size}个好友，${Bot[this.id].gl.size}个群。`
     common.info(this.id, log)
     return log
+  }
+
+/** 设置个人资料 */
+  async setQQProfile ({nickname = this.nickname, personal_note, sex} = {}) {
+    common.mark("参数：", nickname, personal_note, sex)
+    return await api.set_qq_profile(this.id, nickname, personal_note, sex)
   }
 
   /** 设置头像 */
@@ -1495,7 +1516,7 @@ async getMSG (msg_id) {
     this.bot.send(log)
 
     /** 等待响应 */
-    for (let i = 0; i < 3600; i++) {
+    for (let i = 0; i < 2400; i++) {
       const data = lain.echo[echo]
       if (data) {
         delete lain.echo[echo]
