@@ -199,6 +199,10 @@ class OneBotv11Core {
           common.info(this.id, data.duration === 0
             ? `机器人[${this.id}]在群[${data.group_id}]被解除禁言`
             : `机器人[${this.id}]在群[${data.group_id}]被禁言${data.duration}秒`)
+        } else if (data.user_id === 0) {
+          common.info(this.id, data.duration === 0
+            ? `群[${data.group_id}]被[${data.operator_id}]解除了全体禁言`
+            : `群[${data.group_id}]被[${data.operator_id}]开启了全体禁言`)
         } else {
           common.info(this.id, data.duration === 0
             ? `成员[${data.user_id}]在群[${data.group_id}]被解除禁言`
@@ -894,11 +898,13 @@ class OneBotv11Core {
       if (e.group_id) {
         e.notice_type = 'group'
         e.group = { ...this.pickGroup(group_id) }
-        let fl = await Bot[this.id].api.get_stranger_info(Number(e.user_id))
-        e.member = {
-          ...fl,
-          card: e.group.pickMember(e.user_id)?.card,
-          nickname: fl?.nickname
+        if (e.user_id) {
+          let fl = await Bot[this.id].api.get_stranger_info(Number(e.user_id))
+          e.member = {
+            ...fl,
+            card: e.group.pickMember(e.user_id)?.card,
+            nickname: fl?.nickname
+          }
         }
       } else {
         e.notice_type = 'friend'
