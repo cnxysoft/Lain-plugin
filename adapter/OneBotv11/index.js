@@ -476,10 +476,9 @@ class OneBotv11Core {
   }
 
 /** 设置个人资料 */
-  async setQQProfile ({nickname = this.nickname, personal_note, sex} = {}) {
-    common.mark("参数：", nickname, personal_note, sex)
-    return await api.set_qq_profile(this.id, nickname, personal_note, sex)
-  }
+async setQQProfile ({ nickname = this.nickname, personal_note, sex, company, email, college, age, birthday } = {}) {
+  return await api.set_qq_profile(this.id, nickname, company, email, college, personal_note, age, birthday, sex);
+}
 
   /** 设置头像 */
   async setAvatar (imgPath, groupId) {
