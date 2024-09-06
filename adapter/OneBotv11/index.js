@@ -160,29 +160,29 @@ class OneBotv11Core {
         data.notice_type = 'group'
         data.set = data.sub_type === 'set'
         data.sub_type = 'admin'
-        // data.user_id = data.target_id
+        data.target_id = data.user_id
         if (this.id === data.user_id) {
           let gml = await Bot[this.id].gml.get(data.group_id)
-          gml[this.id] = { ...gml[this.id] }
+          gml.set(this.id, { ...gml.get(this.id) })
           if (data.set) {
-            gml[this.id].role = 'admin'
+            gml.get(this.id).role = 'admin'
             common.info(this.id, `机器人[${this.id}]在群[${data.group_id}]被设置为管理员`)
           } else {
-            gml[this.id].role = 'member'
+            gml.get(this.id).role = 'member'
             common.info(this.id, `机器人[${this.id}]在群[${data.group_id}]被取消管理员`)
           }
-          Bot[this.id].gml.set(data.group_id, { ...gml })
+          Bot[this.id].gml.set(data.group_id, gml)
         } else {
           let gml = await Bot[this.id].gml.get(data.group_id)
-          gml[data.target_id] = { ...gml[data.target_id] }
+          gml.set(data.target_id, { ...gml.get(data.target_id) })
           if (data.set) {
-            gml[data.target_id].role = 'admin'
+            gml.get(data.target_id).role = 'admin'
             common.info(this.id, `成员[${data.target_id}]在群[${data.group_id}]被设置为管理员`)
           } else {
-            gml[data.target_id].role = 'member'
+            gml.get(data.target_id).role = 'member'
             common.info(this.id, `成员[${data.target_id}]在群[${data.group_id}]被取消管理员`)
           }
-          Bot[this.id].gml.set(data.group_id, { ...gml })
+          Bot[this.id].gml.set(data.group_id, gml)
         }
         break
         // return await Bot.emit('notice.group', await this.ICQQEvent(data))
@@ -561,8 +561,8 @@ async setQQProfile ({ nickname = this.nickname, personal_note, sex, company, ema
   /** 群对象 */
   pickGroup (group_id) {
     const name = Bot[this.id].gl.get(group_id)?.group_name || group_id
-    const is_admin = (Bot[this.id].gml.get(group_id)?.[this.id]?.role || Bot[this.id].gml.get(group_id)?.get(this.id)?.role) === 'admin'
-    const is_owner = (Bot[this.id].gml.get(group_id)?.[this.id]?.role || Bot[this.id].gml.get(group_id)?.get(this.id)?.role) === 'owner'
+    const is_admin = Bot[this.id].gml.get(group_id)?.get(this.id)?.role === 'admin'
+    const is_owner = Bot[this.id].gml.get(group_id)?.get(this.id)?.role === 'owner'
     return {
       name,
       is_admin: is_owner || is_admin,
