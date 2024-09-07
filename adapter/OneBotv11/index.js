@@ -7,7 +7,7 @@ import { faceMap, pokeMap } from '../../model/shamrock/face.js'
 import api from './api.js'
 
 class OneBotv11Core {
-  constructor (bot, request) {
+  constructor(bot, request) {
     /** 存一下 */
     bot.request = request
     /** 机器人QQ号 */
@@ -21,7 +21,7 @@ class OneBotv11Core {
   }
 
   /** 收到请求 */
-  async event (data) {
+  async event(data) {
     /** 解析得到的JSON */
     data = JSON.parse(data)
     /** debug日志 */
@@ -42,7 +42,7 @@ class OneBotv11Core {
   }
 
   /** 元事件 */
-  async meta_event (data) {
+  async meta_event(data) {
     switch (data.meta_event_type) {
       /** 生命周期 */
       case 'lifecycle':
@@ -60,13 +60,13 @@ class OneBotv11Core {
   }
 
   /** 消息事件 */
-  async message (data) {
+  async message(data) {
     /** 转置消息后给喵崽 */
     await Bot.emit('message', await this.ICQQEvent(data))
   }
 
   /** 自身消息事件 */
-  async message_sent (data) {
+  async message_sent(data) {
     data.post_type = 'message'
     /** 屏蔽由喵崽处理过后发送后的消息 */
     await common.sleep(1500)
@@ -76,7 +76,7 @@ class OneBotv11Core {
   }
 
   /** 通知事件 */
-  async notice (data) {
+  async notice(data) {
     /** 啊啊啊，逼死强迫症 */
     data.post_type = 'notice';
     (async () => {
@@ -266,7 +266,7 @@ class OneBotv11Core {
 
         common.info(this.id, `好友消息撤回：[${data.remark || data.nickname}(${data.user_id})] ${data.message_id}`)
         break
-        // return await Bot.emit('notice.friend', await this.ICQQEvent(data))
+      // return await Bot.emit('notice.friend', await this.ICQQEvent(data))
       case 'group_upload': {
         data.notice_type = 'group'
         data.sub_type = 'upload'
@@ -279,7 +279,7 @@ class OneBotv11Core {
   }
 
   /** 请求事件 */
-  async request (data) {
+  async request(data) {
     data.post_type = 'request'
     switch (data.request_type) {
       case 'group': {
@@ -339,7 +339,7 @@ class OneBotv11Core {
   }
 
   /** 注册Bot */
-  async LoadBot () {
+  async LoadBot() {
     /** 构建基本参数 */
     Bot[this.id] = {
       ws: this.bot,
@@ -380,8 +380,8 @@ class OneBotv11Core {
       MsgTotal: async (type) => common.MsgTotal(this.id, 'OneBotv11', type, true),
       setAvatar: async (imgPath) => await this.setAvatar(String(imgPath)),
       setNickname: async (name) => await this.setQQProfile(name),
-      setGender: async (gender) => await this.setQQProfile({sex: gender}),
-      setSignature: async (signature) => await this.setQQProfile({personal_note: signature}),
+      setGender: async (gender) => await this.setQQProfile({ sex: gender }),
+      setSignature: async (signature) => await this.setQQProfile({ personal_note: signature }),
       api: new Proxy(api, {
         get: (target, prop) => {
           try {
@@ -413,7 +413,7 @@ class OneBotv11Core {
   }
 
   /** 加载缓存资源 */
-  async LoadAll () {
+  async LoadAll() {
     /** 获取bot自身信息 */
     const info = await api.get_login_info(this.id)
     Bot[this.id].nickname = info?.nickname || ''
@@ -475,13 +475,13 @@ class OneBotv11Core {
     return log
   }
 
-/** 设置个人资料 */
-async setQQProfile ({ nickname = this.nickname, personal_note, sex, company, email, college, age, birthday } = {}) {
-  return await api.set_qq_profile(this.id, nickname, company, email, college, personal_note, age, birthday, sex);
-}
+  /** 设置个人资料 */
+  async setQQProfile({ nickname = this.nickname, personal_note, sex, company, email, college, age, birthday } = {}) {
+    return await api.set_qq_profile(this.id, nickname, company, email, college, personal_note, age, birthday, sex);
+  }
 
   /** 设置头像 */
-  async setAvatar (imgPath, groupId) {
+  async setAvatar(imgPath, groupId) {
     if (groupId) {
       return await api.set_group_portrait(this.id, groupId, imgPath)
     } else {
@@ -490,7 +490,7 @@ async setQQProfile ({ nickname = this.nickname, personal_note, sex, company, ema
   }
 
   /** 群列表 */
-  async loadGroup (id = this.id) {
+  async loadGroup(id = this.id) {
     let groupList
     for (let retries = 0; retries < 5; retries++) {
       groupList = await api.get_group_list(id)
@@ -514,12 +514,11 @@ async setQQProfile ({ nickname = this.nickname, personal_note, sex, company, ema
   }
 
   /** 获取群成员，缓存到gml中 */
-  async loadGroupMemberList (groupId, id = this.id) {
+  async loadGroupMemberList(groupId, id = this.id) {
     try {
       let gml = new Map()
       let memberList = await api.get_group_member_list(id, groupId)
       for (const user of memberList) {
-        user.card = user.card
         user.uin = this.id
         gml.set(user.user_id, user)
       }
@@ -530,7 +529,7 @@ async setQQProfile ({ nickname = this.nickname, personal_note, sex, company, ema
   }
 
   /** 好友列表 */
-  async loadFriendList (id = this.id) {
+  async loadFriendList(id = this.id) {
     let friendList
     for (let retries = 0; retries < 5; retries++) {
       friendList = await api.get_friend_list(id)
@@ -559,7 +558,7 @@ async setQQProfile ({ nickname = this.nickname, personal_note, sex, company, ema
   }
 
   /** 群对象 */
-  pickGroup (group_id) {
+  pickGroup(group_id) {
     const name = Bot[this.id].gl.get(group_id)?.group_name || group_id
     const is_admin = Bot[this.id].gml.get(group_id)?.get(this.id)?.role === 'admin'
     const is_owner = Bot[this.id].gml.get(group_id)?.get(this.id)?.role === 'owner'
@@ -635,7 +634,7 @@ async setQQProfile ({ nickname = this.nickname, personal_note, sex, company, ema
   }
 
   /** 好友对象 */
-  pickFriend (user_id) {
+  pickFriend(user_id) {
     return {
       thumbUp: async (times) => await this.thumbUp(user_id, times),
       sendMsg: async (msg) => await this.sendFriendMsg(user_id, msg, false),
@@ -665,18 +664,18 @@ async setQQProfile ({ nickname = this.nickname, personal_note, sex, company, ema
     }
   }
 
-   /**
-   * 好友点赞
-   * @param {number} user_id - 点赞用户
-   * @param {number} times - 点赞次数
-   * @return {Promise<void>} - 点赞结果
-   */
-  async thumbUp (user_id, times) {
+  /**
+  * 好友点赞
+  * @param {number} user_id - 点赞用户
+  * @param {number} times - 点赞次数
+  * @return {Promise<void>} - 点赞结果
+  */
+  async thumbUp(user_id, times) {
     return await api.send_like(this.id, user_id, times)
   }
 
   /** 群员对象 */
-  pickMember (group_id, user_id, refresh = false, cb = () => { }) {
+  pickMember(group_id, user_id, refresh = false, cb = () => { }) {
     if (!refresh) {
       /** 取缓存！！！别问为什么，因为傻鸟同步 */
       let member = Bot[this.id].gml.get(group_id)?.get(user_id) || {}
@@ -694,7 +693,7 @@ async setQQProfile ({ nickname = this.nickname, personal_note, sex, company, ema
   }
 
   /** 群成员列表 */
-  async getMemberMap (group_id) {
+  async getMemberMap(group_id) {
     let group_Member = Bot[this.id].gml.get(group_id)
     if (group_Member && Object.keys(group_Member) > 0) return group_Member
     group_Member = new Map()
@@ -706,7 +705,7 @@ async setQQProfile ({ nickname = this.nickname, personal_note, sex, company, ema
   }
 
   /** 频道成员列表 */
-  getChannelList (guild_id) {
+  getChannelList(guild_id) {
     return {
       channel_id: 'string',
       channel_name: 'string',
@@ -716,7 +715,7 @@ async setQQProfile ({ nickname = this.nickname, personal_note, sex, company, ema
   }
 
   /** 上传群文件 */
-  async upload_group_file (group_id, filePath) {
+  async upload_group_file(group_id, filePath) {
     if (!fs.existsSync(filePath)) return true
     /** 先传到shamrock... */
     const base64 = 'base64://' + fs.readFileSync(filePath).toString('base64')
@@ -726,7 +725,7 @@ async setQQProfile ({ nickname = this.nickname, personal_note, sex, company, ema
   }
 
   /** 上传好友文件 */
-  async upload_private_file (user_id, filePath) {
+  async upload_private_file(user_id, filePath) {
     if (!fs.existsSync(filePath)) return true
     /** 先传到shamrock... */
     const base64 = 'base64://' + fs.readFileSync(filePath).toString('base64')
@@ -736,12 +735,12 @@ async setQQProfile ({ nickname = this.nickname, personal_note, sex, company, ema
   }
 
   /** 获取文件下载链接 */
-  async getFileUrl () {
+  async getFileUrl() {
     return logger.warn('暂未实现，请先使用 [e.file]')
   }
 
   /** 音乐分享 */
-  async shareMusic (group_id, platform, id) {
+  async shareMusic(group_id, platform, id) {
     if (!['qq', '163'].includes(platform)) {
       return 'platform not supported yet'
     }
@@ -749,19 +748,19 @@ async setQQProfile ({ nickname = this.nickname, personal_note, sex, company, ema
   }
 
   /** 设置精华 */
-  async setEssenceMessage (msg_id) {
+  async setEssenceMessage(msg_id) {
     let res = await api.set_essence_msg(this.id, msg_id)
     return res?.result?.errorCode === 0 ? '加精成功' : res?.result?.wording
   }
 
   /** 移除群精华消息 **/
-  async removeEssenceMessage (msg_id) {
+  async removeEssenceMessage(msg_id) {
     let res = await api.delete_essence_msg(this.id, msg_id)
-    return res?.result?.errorCode  === 0 ? '移精成功' : res?.result?.wording
+    return res?.result?.errorCode === 0 ? '移精成功' : res?.result?.wording
   }
 
   /** 获取群成员信息 */
-  async getGroupMemberInfo (group_id, user_id, refresh) {
+  async getGroupMemberInfo(group_id, user_id, refresh) {
     /** 被自己坑了 */
     if (user_id == '88888' || user_id == 'stdin') user_id = this.id
     try {
@@ -774,12 +773,12 @@ async setQQProfile ({ nickname = this.nickname, personal_note, sex, company, ema
   }
 
   /** 退群 */
-  async quit (group_id) {
+  async quit(group_id) {
     return await api.set_group_leave(this.id, group_id)
   }
 
   /** 制作转发消息 */
-  async makeForwardMsg (data) {
+  async makeForwardMsg(data) {
     if (!Array.isArray(data)) data = [data]
     let makeForwardMsg = {
       /** 标记下，视为转发消息，防止套娃 */
@@ -810,7 +809,7 @@ async setQQProfile ({ nickname = this.nickname, personal_note, sex, company, ema
           if (content[0].type === 'node') {
             makeForwardMsg.message.push(...content)
           } else {
-            makeForwardMsg.message.push({ type: 'node', data: {type: 'node', data: { name: this.nickname || 'OneBotv11', uin: String(this.id), content }}})
+            makeForwardMsg.message.push({ type: 'node', data: { type: 'node', data: { name: this.nickname || 'OneBotv11', uin: String(this.id), content } } })
           }
         } catch (err) {
           common.error(this.id, err)
@@ -821,19 +820,19 @@ async setQQProfile ({ nickname = this.nickname, personal_note, sex, company, ema
   }
 
   /** 撤回消息 */
-  async recallMsg (msg_id) {
+  async recallMsg(msg_id) {
     // 把已撤回的MSGID存起来，椰奶校验撤回成功与否要用到
     Bot[this.id].recallMsgs.set(msg_id, true)
     return await api.delete_msg(this.id, msg_id)
   }
 
   /** 获取禁言列表 */
-  async getMuteList (group_id) {
+  async getMuteList(group_id) {
     return await api.get_prohibited_member_list(this.id, group_id)
   }
 
   /** 转换消息为ICQQ格式 */
-  async ICQQEvent (data) {
+  async ICQQEvent(data) {
     const { post_type, group_id, user_id, message_type, message_id, sender } = data
     /** 初始化e */
     let e = data
@@ -988,7 +987,7 @@ async setQQProfile ({ nickname = this.nickname, personal_note, sex, company, ema
  * @param reply 是否处理引用消息，默认处理
  * @return {Promise<{source: (*&{user_id, raw_message: string, reply: *, seq}), message: *[]}|{source: string, message: *[]}>}
  */
-  async getMessage (msg, group_id, reply = true) {
+  async getMessage(msg, group_id, reply = true) {
     let file
     let source
     let message = []
@@ -1000,7 +999,7 @@ async setQQProfile ({ nickname = this.nickname, personal_note, sex, company, ema
       switch (i.type) {
         /** AT 某人 */
         case 'at':
-          message.push({ type: 'at', qq: Number(i.data.qq) || 0})
+          message.push({ type: 'at', qq: Number(i.data.qq) || 0 })
           try {
             let qq = i.data.qq
             ToString.push(`{at:${qq}}`)
@@ -1211,22 +1210,22 @@ async setQQProfile ({ nickname = this.nickname, personal_note, sex, company, ema
    * @param {string} emoji_id - 表情id
    * @return {array|false} -
    */
-  async setMsgEmojiLike (msg_id, emoji_id) {
+  async setMsgEmojiLike(msg_id, emoji_id) {
     if (!msg_id || !emoji_id) return false
     return await api.set_msg_emoji_like(this.id, msg_id, emoji_id)
-}
+  }
 
   /**
    * 获取指定消息
    * @param {number} msg_id
    * @return {array|false} -
    */
-async getMSG (msg_id) {
+  async getMSG(msg_id) {
     if (!msg_id) return false
     // 查询是否已经撤回过，撤回过的默认不予读取
     if (Bot[this.id].recallMsgs.get(msg_id)) {
-        Bot[this.id].recallMsgs = new Map()
-        return false
+      Bot[this.id].recallMsgs = new Map()
+      return false
     }
     let source
     try {
@@ -1260,7 +1259,7 @@ async getMSG (msg_id) {
       logger.error(error)
       return false
     }
-}
+  }
 
   /**
    * 获取被引用的消息
@@ -1268,7 +1267,7 @@ async getMSG (msg_id) {
    * @param {number} group_id
    * @return {array|false} -
    */
-  async source (i, group_id) {
+  async source(i, group_id) {
     /** 引用消息的id */
     const msg_id = i.data.id
     /** id不存在滚犊子... */
@@ -1318,7 +1317,7 @@ async getMSG (msg_id) {
  * @param {string|object|array} msg - 消息内容
  * @param {boolean} quote - 是否引用回复
  */
-  async sendReplyMsg (e, id, msg, quote) {
+  async sendReplyMsg(e, id, msg, quote) {
     let { message, raw_message, node } = await this.getOneBotv11Core(msg)
 
     if (quote) {
@@ -1335,7 +1334,7 @@ async getMSG (msg_id) {
    * @param {number} user_id - 好友QQ
    * @param {string|object|array} msg - 消息内容
    */
-  async sendFriendMsg (user_id, msg) {
+  async sendFriendMsg(user_id, msg) {
     const { message, raw_message, node } = await this.getOneBotv11Core(msg)
     return await api.send_private_msg(this.id, user_id, message, raw_message, node)
   }
@@ -1345,7 +1344,7 @@ async getMSG (msg_id) {
    * @param {number} group_id - 群聊QQ
    * @param {string|object|array} msg - 消息内容
    */
-  async sendGroupMsg (group_id, msg) {
+  async sendGroupMsg(group_id, msg) {
     const { message, raw_message, node } = await this.getOneBotv11Core(msg)
     return await api.send_group_msg(this.id, group_id, message, raw_message, node)
   }
@@ -1354,7 +1353,7 @@ async getMSG (msg_id) {
    * 转换message为LagrangeCore格式
    * @param {string|Array|object} data - 消息内容
    */
-  async getOneBotv11Core (data) {
+  async getOneBotv11Core(data) {
     let node = data?.test || false
     /** 标准化消息内容 */
     data = common.array(data)
@@ -1492,7 +1491,7 @@ async getMSG (msg_id) {
         case 'node':
           node = true
           message.push({ type: 'node', data: { ...i.data } })
-          raw_message.push(`<转发消息:${ i.data.id || "自造" }>`)
+          raw_message.push(`<转发消息:${i.data.id || "自造"}>`)
           break
         default:
           // 为了兼容更多字段，不再进行序列化，风险是有可能未知字段导致LagrangeCore崩溃
@@ -1512,7 +1511,7 @@ async getMSG (msg_id) {
   * @param {string} action - 请求 API 端点
   * @param {string} params - 请求参数
   */
-  async sendApi (action, params) {
+  async sendApi(action, params) {
     const echo = randomUUID()
     /** 序列化 */
     const log = JSON.stringify({ echo, action, params })

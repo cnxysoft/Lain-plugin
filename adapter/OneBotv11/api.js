@@ -10,7 +10,7 @@ let api = {
    * @param {string} message_id - 消息id
    * @param {string} emoji_id - 回应的表情id
    */
-  async set_msg_emoji_like (id, message_id, emoji_id) {
+  async set_msg_emoji_like(id, message_id, emoji_id) {
     const params = { message_id, emoji_id }
     return await this.SendApi(id, 'set_msg_emoji_like', params)
   },
@@ -20,7 +20,7 @@ let api = {
    * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
    * @param {string} message_id - 消息id
    */
-  async get_msg (id, message_id) {
+  async get_msg(id, message_id) {
     const params = { message_id }
     return await this.SendApi(id, 'get_msg', params)
   },
@@ -30,7 +30,7 @@ let api = {
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   * @param {string} message_id - 消息id
   */
-  async delete_msg (id, message_id) {
+  async delete_msg(id, message_id) {
     const params = { message_id }
     return await this.SendApi(id, 'delete_msg', params)
   },
@@ -39,7 +39,7 @@ let api = {
   * 获取登录号信息
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   */
-  async get_login_info (id) {
+  async get_login_info(id) {
     const params = {}
     return await this.SendApi(id, 'get_login_info', params)
   },
@@ -56,7 +56,7 @@ let api = {
   * @param {string} [birthday] - 生日 (格式：YYYY-MM-DD) (可选)
   * @param {number} sex - 性别 (格式：0无/1男性/2女性) (可选)
   */
-  async set_qq_profile (id, nickname, company, email, college, personal_note, age, birthday, sex) {
+  async set_qq_profile(id, nickname, company, email, college, personal_note, age, birthday, sex) {
     const params = { nickname, company, email, college, personal_note, age, birthday, sex }
     return await this.SendApi(id, 'set_qq_profile', params)
   },
@@ -66,7 +66,7 @@ let api = {
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   * @param {string} file - 头像图片（支持 base64、文件路径、URL）
   */
-  async set_qq_avatar (id, file) {
+  async set_qq_avatar(id, file) {
     const params = { file }
     return await this.SendApi(id, 'set_qq_avatar', params)
   },
@@ -77,7 +77,7 @@ let api = {
   * @param {string} user_id - 陌生人QQ
   * @param {boolean} no_cache - 是否启用缓存
   */
-  async get_stranger_info (id, user_id, no_cache = false) {
+  async get_stranger_info(id, user_id, no_cache = false) {
     const params = { user_id, no_cache }
     return await this.SendApi(id, 'get_stranger_info', params)
   },
@@ -86,7 +86,7 @@ let api = {
   * 获取好友列表
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   */
-  async get_friend_list (id) {
+  async get_friend_list(id) {
     const params = {}
     return await this.SendApi(id, 'get_friend_list', params)
   },
@@ -95,7 +95,7 @@ let api = {
   * 获取单向好友列表 (未实现)
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   */
-  async get_unidirectional_friend_list (id) {
+  async get_unidirectional_friend_list(id) {
     const params = {}
     return await this.SendApi(id, 'get_unidirectional_friend_list', params)
   },
@@ -106,7 +106,7 @@ let api = {
   * @param {number} group_id - 群号
   * @param refresh 是否刷新
   */
-  async get_group_info (id, group_id, refresh = false) {
+  async get_group_info(id, group_id, refresh = false) {
     const params = { group_id, refresh }
     return await this.SendApi(id, 'get_group_info', params)
   },
@@ -115,7 +115,7 @@ let api = {
   * 获取群列表
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   */
-  async get_group_list (id) {
+  async get_group_list(id) {
     const params = {}
     return await this.SendApi(id, 'get_group_list', params)
   },
@@ -127,8 +127,8 @@ let api = {
   * @param {number} user_id - 群成员QQ号
   * @param {boolean} refresh - 是否强制刷新，会获取age, area和level字段
   */
-  async get_group_member_info (id, group_id, user_id, refresh = false) {
-    const params = { group_id, user_id, refresh }
+  async get_group_member_info(id, group_id, user_id, refresh = false) {
+    const params = { group_id, user_id, no_cache: refresh }
     return await this.SendApi(id, 'get_group_member_info', params)
   },
 
@@ -137,8 +137,8 @@ let api = {
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   * @param {number} group_id - 群号
   */
-  async get_group_member_list (id, group_id) {
-    const params = { group_id }
+  async get_group_member_list(id, group_id, no_cache = false) {
+    const params = { group_id, no_cache }
     return await this.SendApi(id, 'get_group_member_list', params)
   },
 
@@ -147,7 +147,7 @@ let api = {
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   * @param {number} group_id - 群号
   */
-  async get_group_honor_info (id, group_id) {
+  async get_group_honor_info(id, group_id) {
     const params = { group_id }
     return await this.SendApi(id, 'get_group_honor_info', params)
   },
@@ -156,7 +156,7 @@ let api = {
   * 获取群系统消息
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   */
-  async get_group_system_msg (id) {
+  async get_group_system_msg(id) {
     const params = {}
     return await this.SendApi(id, 'get_group_system_msg', params)
   },
@@ -166,7 +166,7 @@ let api = {
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   * @param {number} group_id - 群号
   */
-  async get_essence_msg_list (id, group_id) {
+  async get_essence_msg_list(id, group_id) {
     const params = { group_id }
     return await this.SendApi(id, 'get_essence_msg_list', params)
   },
@@ -176,7 +176,7 @@ let api = {
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   * @param {number} user_id - QQ账号
   */
-  async is_blacklist_uin (id, user_id) {
+  async is_blacklist_uin(id, user_id) {
     const params = { user_id }
     return await this.SendApi(id, 'is_blacklist_uin', params)
   },
@@ -186,7 +186,7 @@ let api = {
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   * @param {number} user_id - 好友 QQ 号
   */
-  async delete_friend (id, user_id) {
+  async delete_friend(id, user_id) {
     const params = { user_id }
     return await this.SendApi(id, 'delete_friend', params)
   },
@@ -195,7 +195,7 @@ let api = {
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   * @param {number} user_id - 单向好友QQ号
   */
-  async delete_unidirectional_friend (id, user_id) {
+  async delete_unidirectional_friend(id, user_id) {
     const params = { user_id }
     return await this.SendApi(id, 'delete_unidirectional_friend', params)
   },
@@ -206,7 +206,7 @@ let api = {
   * @param {number} group_id - 群号
   * @param {string} group_name - 新群名
   */
-  async set_group_name (id, group_id, group_name) {
+  async set_group_name(id, group_id, group_name) {
     const params = { group_id, group_name }
     return await this.SendApi(id, 'set_group_name', params)
   },
@@ -218,7 +218,7 @@ let api = {
   * @param {number} file - 图片文件
   * @param {number} cache - 是否使用已缓存的文件 通过网络URL发送时有效, 1表示使用缓存, 0关闭关闭缓存
   */
-  async set_group_portrait (id, group_id, file, cache = 1) {
+  async set_group_portrait(id, group_id, file, cache = 1) {
     const params = { group_id, file, cache }
     return await this.SendApi(id, 'set_group_portrait', params)
   },
@@ -230,7 +230,7 @@ let api = {
   * @param {number} user_id - QQ账号
   * @param {bool} enable - 是否设置
   */
-  async set_group_admin (id, group_id, user_id, enable) {
+  async set_group_admin(id, group_id, user_id, enable) {
     const params = { group_id, user_id, enable }
     return await this.SendApi(id, 'set_group_admin', params)
   },
@@ -242,7 +242,7 @@ let api = {
   * @param {number} user_id - QQ账号
   * @param {string} card - 群名片内容, 不填或空字符串表示删除群名片
   */
-  async set_group_card (id, group_id, user_id, card) {
+  async set_group_card(id, group_id, user_id, card) {
     const params = { group_id, user_id, card }
     return await this.SendApi(id, 'set_group_card', params)
   },
@@ -254,7 +254,7 @@ let api = {
   * @param {number} user_id - QQ号
   * @param {string} special_title - 头衔
   */
-  async set_group_special_title (id, group_id, user_id, special_title) {
+  async set_group_special_title(id, group_id, user_id, special_title) {
     const params = { group_id, user_id, special_title }
     return await this.SendApi(id, 'set_group_special_title', params)
   },
@@ -266,7 +266,7 @@ let api = {
   * @param {number} user_id - QQ号
   * @param {number} duration - 禁言时长，为 0 时，将解除禁言。
   */
-  async set_group_ban (id, group_id, user_id, duration) {
+  async set_group_ban(id, group_id, user_id, duration) {
     const params = { group_id, user_id, duration }
     return await this.SendApi(id, 'set_group_ban', params)
   },
@@ -277,7 +277,7 @@ let api = {
   * @param {number} group_id - 群号
   * @param {boolean} enable - 是否禁言
   */
-  async set_group_whole_ban (id, group_id, enable) {
+  async set_group_whole_ban(id, group_id, enable) {
     const params = { group_id, enable }
     return await this.SendApi(id, 'set_group_whole_ban', params)
   },
@@ -287,7 +287,7 @@ let api = {
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   * @param {number} message_id - 消息ID
   */
-  async set_essence_msg (id, message_id) {
+  async set_essence_msg(id, message_id) {
     const params = { message_id }
     return await this.SendApi(id, 'set_essence_msg', params)
   },
@@ -297,7 +297,7 @@ let api = {
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   * @param {number} message_id - 消息ID
   */
-  async delete_essence_msg (id, message_id) {
+  async delete_essence_msg(id, message_id) {
     const params = { message_id }
     return await this.SendApi(id, 'delete_essence_msg', params)
   },
@@ -307,7 +307,7 @@ let api = {
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   * @param {number} group_id - 群号
   */
-  async send_group_sign (id, group_id) {
+  async send_group_sign(id, group_id) {
     const params = { group_id }
     return await this.SendApi(id, 'send_group_sign', params)
   },
@@ -319,7 +319,7 @@ let api = {
   * @param {string} content - 公告内容
   * @param {string} image - 图片路径（可选）
   */
-  async send_group_notice (id, group_id, content, image) {
+  async send_group_notice(id, group_id, content, image) {
     const params = { group_id, content, image }
     return await this.SendApi(id, '_send_group_notice', params)
   },
@@ -329,7 +329,7 @@ let api = {
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   * @param {number} group_id - 群号
   */
-  async get_group_notice (id, group_id) {
+  async get_group_notice(id, group_id) {
     const params = { group_id }
     return await this.SendApi(id, '_get_group_notice', params)
   },
@@ -341,7 +341,7 @@ let api = {
   * @param {number} user_id - QQ号
   * @param {boolean} reject_add_request - 是否拒绝再次加群
   */
-  async set_group_kick (id, group_id, user_id, reject_add_request) {
+  async set_group_kick(id, group_id, user_id, reject_add_request) {
     const params = { group_id, user_id, reject_add_request }
     return await this.SendApi(id, 'set_group_kick', params)
   },
@@ -351,7 +351,7 @@ let api = {
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   * @param {number} group_id - 群号
   */
-  async set_group_leave (id, group_id) {
+  async set_group_leave(id, group_id) {
     const params = { group_id }
     return await this.SendApi(id, 'set_group_leave', params)
   },
@@ -362,7 +362,7 @@ let api = {
   * @param {number} group_id - 群号
   * @param {number} user_id - QQ号
   */
-  async group_touch (id, group_id, user_id) {
+  async group_touch(id, group_id, user_id) {
     const params = {
       group_id,
       message: [{ type: 'touch', data: { id: user_id } }]
@@ -377,7 +377,7 @@ let api = {
   * @param {string} file - 本地文件路径
   * @param {string} name - 文件名称
   */
-  async upload_private_file (id, user_id, file, name) {
+  async upload_private_file(id, user_id, file, name) {
     const params = { user_id, file, name }
     return await this.SendApi(id, 'upload_private_file', params)
   },
@@ -389,7 +389,7 @@ let api = {
   * @param {string} file - 本地文件路径
   * @param {string} name - 储存名称
   */
-  async upload_group_file (id, group_id, file, name) {
+  async upload_group_file(id, group_id, file, name) {
     const params = { group_id, file, name }
     return await this.SendApi(id, 'upload_group_file', params)
   },
@@ -401,7 +401,7 @@ let api = {
   * @param {string} file_id - 文件ID 参考 File 对象
   * @param {number} busid - 文件类型 参考 File 对象
   */
-  async delete_group_file (id, group_id, file_id, busid) {
+  async delete_group_file(id, group_id, file_id, busid) {
     const params = { group_id, file_id, busid }
     return await this.SendApi(id, 'delete_group_file', params)
   },
@@ -411,7 +411,7 @@ let api = {
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   * @param {number} group_id - 群号
   */
-  async create_group_file_folder (id, group_id) {
+  async create_group_file_folder(id, group_id) {
     const params = { group_id }
     return await this.SendApi(id, 'create_group_file_folder', params)
   },
@@ -422,7 +422,7 @@ let api = {
   * @param {number} group_id - 群号
   * @param {string} folder_id - 文件夹ID 参考 Folder 对象
   */
-  async delete_group_folder (id, group_id, folder_id) {
+  async delete_group_folder(id, group_id, folder_id) {
     const params = { group_id, folder_id }
     return await this.SendApi(id, 'delete_group_folder', params)
   },
@@ -432,7 +432,7 @@ let api = {
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   * @param {number} group_id - 群号
   */
-  async get_group_file_system_info (id, group_id) {
+  async get_group_file_system_info(id, group_id) {
     const params = { group_id }
     return await this.SendApi(id, 'get_group_file_system_info', params)
   },
@@ -442,7 +442,7 @@ let api = {
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   * @param {number} group_id - 群号
   */
-  async get_group_root_files (id, group_id) {
+  async get_group_root_files(id, group_id) {
     const params = { group_id }
     return await this.SendApi(id, 'get_group_root_files', params)
   },
@@ -453,7 +453,7 @@ let api = {
   * @param {number} group_id - 群号
   * @param {string} folder_id - 文件夹ID 参考 Folder 对象
   */
-  async get_group_files_by_folder (id, group_id, folder_id) {
+  async get_group_files_by_folder(id, group_id, folder_id) {
     const params = { group_id, folder_id }
     return await this.SendApi(id, 'get_group_files_by_folder', params)
   },
@@ -465,7 +465,7 @@ let api = {
   * @param {string} file_id - 文件ID 参考 File 对象
   * @param {number} busid - 文件类型 参考 File 对象
   */
-  async get_group_file_url (id, group_id, file_id, busid) {
+  async get_group_file_url(id, group_id, file_id, busid) {
     const params = { group_id, file_id, busid }
     return await this.SendApi(id, 'get_group_file_url', params)
   },
@@ -476,7 +476,7 @@ let api = {
   * @param {number} user_id - 对方 QQ 号
   * @param {number} times - 点赞次数
   */
-  async send_like (id, user_id, times) {
+  async send_like(id, user_id, times) {
     times = Number(times)
     times = times > 20 || times > 10 ? times = 20 : times = 10
     const params = { user_id, times }
@@ -492,7 +492,7 @@ let api = {
   * @param {number} count - 获取的消息数量（默认为20）
   * @param {number} message_seq - 起始消息的message_id（默认为0，表示从最后一条发言往前）
   */
-  async get_history_msg (id, message_type, user_id, group_id, count, message_seq) {
+  async get_history_msg(id, message_type, user_id, group_id, count, message_seq) {
     const params = { message_type, user_id, group_id, count, message_seq }
     return await this.SendApi(id, 'get_history_msg', params)
   },
@@ -504,7 +504,7 @@ let api = {
   * @param {number} count - 获取的消息数量（默认为20）
   * @param {number} message_seq - 起始消息的message_id（默认为0，表示从最后一条发言往前）
   */
-  async get_group_msg_history (id, group_id, count, message_seq) {
+  async get_group_msg_history(id, group_id, count, message_seq) {
     const params = { group_id, count, message_seq }
     return await this.SendApi(id, 'get_group_msg_history', params)
   },
@@ -515,7 +515,7 @@ let api = {
   * @param {string} message_type - 消息 类型 必填 private 或 group
   * @param {number} TargetID - 目标群或者目标好友
   */
-  async clear_msgs (id, message_type, TargetID) {
+  async clear_msgs(id, message_type, TargetID) {
     let type = 'user_id'
     if (message_type == 'group') type = 'group_id'
     const params = { message_type, [type]: TargetID }
@@ -528,7 +528,7 @@ let api = {
   * @param domain
   * @return {Promise<*|string>}
   */
-  async get_cookies (id, domain = '') {
+  async get_cookies(id, domain = '') {
     const params = { domain }
     return await this.SendApi(id, 'get_cookies', params)
   },
@@ -539,7 +539,7 @@ let api = {
   * @param domain
   * @return {Promise<*|string>}
   */
-  async get_csrf_token (id, domain = '') {
+  async get_csrf_token(id, domain = '') {
     const params = { domain }
     return await this.SendApi(id, 'get_csrf_token', params)
   },
@@ -552,7 +552,7 @@ let api = {
   * @param remark 添加后的好友备注（仅在同意时有效）
   * @return {Promise<*|string>}
   */
-  async set_friend_add_request (id, flag, approve, remark = '') {
+  async set_friend_add_request(id, flag, approve, remark = '') {
     const params = { flag, approve, remark }
     return await this.SendApi(id, 'set_friend_add_request', params)
   },
@@ -566,7 +566,7 @@ let api = {
   * @param reason 拒绝理由（仅在拒绝时有效）
   * @return {Promise<*|string>}
   */
-  async set_group_add_request (id, flag, sub_type, approve, reason = '') {
+  async set_group_add_request(id, flag, sub_type, approve, reason = '') {
     const params = { flag, sub_type, approve, reason }
     return await this.SendApi(id, 'set_group_add_request', params)
   },
@@ -580,7 +580,7 @@ let api = {
   * @param reason 拒绝理由（仅在拒绝时有效）
   * @return {Promise<*|string>}
   */
-  async get_weather_city_code (id, city) {
+  async get_weather_city_code(id, city) {
     const params = { city }
     return await this.SendApi(id, 'get_weather_city_code', params)
   },
@@ -591,14 +591,14 @@ let api = {
   * @param {string} file - 文件本地地址
   * @return {Promise<{file, md5}>} file为文件在shamrock端的本地路径，可用于发送文件、语音、视频等
   */
-  async upload_file (id, file) {
+  async upload_file(id, file) {
     let formData = new FormData()
     formData.append('file', fileFromSync(file))
     let data = await this.httpApi(id, 'upload_file', {}, formData)
     return data
   },
 
-  async httpApi (id, action, headers, data, query = '') {
+  async httpApi(id, action, headers, data, query = '') {
     if (!Cfg.Shamrock.baseUrl || !Cfg.Shamrock.baseUrl.startsWith('http')) {
       return common.warn(id, '未配置Shamrock主动http端口')
     }
@@ -635,7 +635,7 @@ let api = {
   * @param {number} thread_cnt - (可选)下载的线程数量
   * @param {string | array} headers - (可选)请求头
   */
-  async download_file (id, file, thread_cnt, headers) {
+  async download_file(id, file, thread_cnt, headers) {
     if (typeof file !== 'string') return
     let type
     if (/https?:\/\//.test(file)) {
@@ -657,7 +657,7 @@ let api = {
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   * @param {string} msg_id - 消息资源ID（卡片消息里面的resId）
   */
-  async get_forward_msg (id, msg_id) {
+  async get_forward_msg(id, msg_id) {
     const params = { msg_id }
     return await this.SendApi(id, 'get_forward_msg', params)
   },
@@ -668,7 +668,7 @@ let api = {
   * @param {number} group_id - 发送到的目标群号
   * @param {foward message[]} messages  - 合并转发消息集
   */
-  async send_group_forward_msg (id, group_id, messages) {
+  async send_group_forward_msg(id, group_id, messages) {
     const params = { group_id, messages }
     return await this.SendApi(id, 'send_group_forward_msg', params)
   },
@@ -679,7 +679,7 @@ let api = {
   * @param {number} user_id - 发送到的目标群号
   * @param {foward message[]} messages  - 合并转发消息集
   */
-  async send_private_forward_msg (id, user_id, messages) {
+  async send_private_forward_msg(id, user_id, messages) {
     const params = { user_id, messages }
     return await this.SendApi(id, 'send_private_forward_msg', params)
   },
@@ -689,7 +689,7 @@ let api = {
   * @param {string} id - 机器人QQ 通过e.bot、Bot调用无需传入
   * @param {number} group_id - 发送到的目标群号
   */
-  async get_prohibited_member_list (id, group_id) {
+  async get_prohibited_member_list(id, group_id) {
     const params = { group_id }
     return await this.SendApi(id, 'get_prohibited_member_list', params)
   },
@@ -701,7 +701,7 @@ let api = {
   * @param {object} message - 发送内容
   * @param {string} raw_message - 发送内容日志
   */
-  async send_private_msg (uin, user_id, message, raw_message, node) {
+  async send_private_msg(uin, user_id, message, raw_message, node) {
     let user_name
     try {
       user_name = Bot[uin].fl.get(user_id)?.user_name
@@ -723,9 +723,9 @@ let api = {
       }
     } else {
       if (message[0].type == "at") {
-        message.splice(0,1)
+        message.splice(0, 1)
 
-      } 
+      }
       const params = { user_id, message }
       res = await this.SendApi(uin, 'send_private_msg', params)
     }
@@ -744,7 +744,7 @@ let api = {
   * @param {object} message - 发送内容
   * @param {string} raw_message - 发送内容日志
   */
-  async send_group_msg (uin, group_id, message, raw_message, node) {
+  async send_group_msg(uin, group_id, message, raw_message, node) {
     let group_name
     try {
       group_name = Bot[uin].gl.get(group_id)?.group_name
@@ -781,7 +781,7 @@ let api = {
   * @param {string} action - 请求 API 端点
   * @param {string} params - 请求参数
   */
-  async SendApi (id, action, params) {
+  async SendApi(id, action, params) {
     const echo = randomUUID()
     /** 序列化 */
     const log = JSON.stringify({ echo, action, params })
@@ -793,10 +793,10 @@ let api = {
       const data = lain.echo[echo]
       if (data) {
         delete lain.echo[echo]
-        if (data.status === 'ok') { 
-          if (data.data === null) data.data = {"message_id": 0}
-	  return data.data
-	} else { common.error(id, data); throw data }
+        if (data.status === 'ok') {
+          if (data.data === null) data.data = { "message_id": 0 }
+          return data.data
+        } else { common.error(id, data); throw data }
       } else {
         await common.sleep(50)
       }
