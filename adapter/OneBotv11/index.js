@@ -415,23 +415,21 @@ class OneBotv11Core {
   /** 加载缓存资源 */
   async LoadAll() {
     /** 获取bot自身信息 */
-    const info = await api.get_login_info(this.id)
-    Bot[this.id].nickname = info?.nickname || ''
-    this.nickname = info?.nickname || ''
-    let _this = this
+    const info = await api.get_login_info(this.id);
+    Bot[this.id].nickname = this.nickname = info?.nickname || '';
     await Promise.all([
       // 加载群信息
       (async () => {
         // 加载群列表
-        let groupList = await _this.loadGroup()
+        let groupList = await this.loadGroup()
         // 加载群员
         await Promise.all(groupList.map(async (group, index) => {
-          await common.sleep(50 * Math.floor(index / 10))
-          await _this.loadGroupMemberList(group.group_id)
+          await common.sleep(500 * Math.floor(index / 10))
+          await this.loadGroupMemberList(group.group_id)
         }))
       })(),
       // 加载好友信息
-      _this.loadFriendList()
+      this.loadFriendList()
     ])
 
     /** 获取bkn */
@@ -454,7 +452,7 @@ class OneBotv11Core {
 
     /** 获取cookies */
     Bot[this.id].cookies = {}
-    let domains = ['aq.qq.com', 'buluo.qq.com', 'connect.qq.com', 'docs.qq.com', 'game.qq.com', 'gamecenter.qq.com', 'haoma.qq.com', 'id.qq.com', 'kg.qq.com', 'mail.qq.com', 'mma.qq.com', 'office.qq.com', 'openmobile.qq.com', 'qqweb.qq.com', 'qun.qq.com', 'qzone.qq.com', 'ti.qq.com', 'v.qq.com', 'vip.qq.com', 'y.qq.com', '']
+    let domains = ['aq.qq.com', 'qqapp.qq.com', 'connect.qq.com', 'docs.qq.com', 'game.qq.com', 'gamecenter.qq.com', 'haoma.qq.com', 'id.qq.com', 'kg.qq.com', 'mail.qq.com', 'mma.qq.com', 'office.qq.com', 'openmobile.qq.com', 'qqweb.qq.com', 'qun.qq.com', 'qzone.qq.com', 'ti.qq.com', 'v.qq.com', 'vip.qq.com', 'y.qq.com', 'qidian.qq.com']
     for (let domain of domains) {
       api.get_cookies(this.id, domain).then(ck => {
         ck = ck?.cookies
@@ -496,7 +494,7 @@ class OneBotv11Core {
       groupList = await api.get_group_list(id)
       if (!(groupList && Array.isArray(groupList))) {
         common.error(this.id, `OneBotv11群列表获取失败，正在重试：${retries + 1}`)
-      }
+      } else { break }
       await common.sleep(50)
     }
 
@@ -535,7 +533,7 @@ class OneBotv11Core {
       friendList = await api.get_friend_list(id)
       if (!(friendList && Array.isArray(friendList))) {
         common.error(this.id, `OneBotv11好友列表获取失败，正在重试：${retries + 1}`)
-      }
+      } else { break }
       await common.sleep(50)
     }
 
