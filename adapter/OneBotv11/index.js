@@ -230,6 +230,15 @@ class OneBotv11Core {
             Bot[this.id].gml.set(data.group_id, gml)
             break
           }
+          case 'profile_like': {
+            data.user_id = data.operator_id
+            common.info(this.id, `用户[${data.operator_id}]赞了你的资料卡[${data.times}]次`)
+            try {
+              let fl = await Bot[this.id].api.get_stranger_info(Number(data.operator_id))
+              e.member = { ...fl }
+            } catch { }
+            break
+          }
           default:
         }
         // const time = Date.now()
