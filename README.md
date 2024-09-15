@@ -20,7 +20,7 @@
 
 Github：
 ```
-git clone --depth=1 https://github.com/XZhouQD/Lain-plugin ./plugins/Lain-plugin
+git clone --depth=1 https://github.com/cnxysoft/Lain-plugin ./plugins/Lain-plugin
 ```
 
 ### 2.安装依赖
