@@ -794,7 +794,7 @@ let api = {
       if (data) {
         delete lain.echo[echo]
         if (data.status === 'ok') {
-          if (data.data === null) data.data = { "message_id": 0 }
+          if (data.data === null) return data
           return data.data
         } else { common.error(id, data); throw data }
       } else {
