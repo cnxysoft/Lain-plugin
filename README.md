@@ -1,9 +1,12 @@
-# 这里是一处Lain-Plugin备份仓库，有一定修改适配云崽V4
+# 这里是一处Lain-Plugin备份仓库，有一定修改适配Yunzai-next
 Github：
 ```
-git clone --depth=1 -b next-pe https://github.com/cnxysoft/Lain-plugin
+git clone --depth=1 -b next-pe https://github.com/cnxysoft/Lain-plugin ./plugins/Lain-plugin/
 ```
-
+## Yunzai-Next安装依赖
+```
+yarn install
+```
 ## 简介
 `Lain-plugin`是一个围绕喵崽`Miao-Yunzai`开发的多适配器插件，让喵崽接入`QQ频道`、`微信`、`shamrock`等三方平台~，不再局限于ICQQ。
 
