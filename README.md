@@ -89,4 +89,4 @@ yarn install
 - [xiaoye12123](https://gitee.com/xiaoye12123)
 - [Lagrange.Core](https://github.com/LagrangeDev/Lagrange.Core)
 - [OneBotv11](https://github.com/OneBotv11/OneBotv11)
-- [Zyy955-提供源代码]
+- Zyy955（提供源代码）
