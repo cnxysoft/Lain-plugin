@@ -1,12 +1,4 @@
 # 这里是一处Lain-Plugin备份仓库，有一定修改适配Yunzai-next
-Github：
-```
-git clone --depth=1 -b next-pe https://github.com/cnxysoft/Lain-plugin ./plugins/Lain-plugin/
-```
-## Yunzai-Next安装依赖
-```
-yarn install
-```
 ## 简介
 `Lain-plugin`是一个围绕喵崽`Miao-Yunzai`开发的多适配器插件，让喵崽接入`QQ频道`、`微信`、`shamrock`等三方平台~，不再局限于ICQQ。
 
@@ -28,19 +20,12 @@ yarn install
 
 Github：
 ```
-git clone --depth=1 https://github.com/cnxysoft/Lain-plugin ./plugins/Lain-plugin
+git clone --depth=1 -b next-pe https://github.com/cnxysoft/Lain-plugin ./plugins/Lain-plugin/
 ```
 
-### 2.安装依赖
+### 2.安装依赖（Yunzai-Next）
 
-```
-pnpm install -P
-```
-
-`安装失败再用这个：`
-```
-pnpm config set sharp_binary_host "https://npmmirror.com/mirrors/sharp" && pnpm config set sharp_libvips_binary_host "https://npmmirror.com/mirrors/sharp-libvips" && pnpm install -P
-```
+yarn install
 
 ### 3.使用适配器
 
@@ -64,7 +49,7 @@ pnpm config set sharp_binary_host "https://npmmirror.com/mirrors/sharp" && pnpm 
 
 ## 插件更新
 
-- #铃音更新
+- #铃音更新（正在修复中目前可用#全部更新进行更新）
 - #Lain更新
 
 ## 如何区分适配器
@@ -104,3 +89,4 @@ pnpm config set sharp_binary_host "https://npmmirror.com/mirrors/sharp" && pnpm 
 - [xiaoye12123](https://gitee.com/xiaoye12123)
 - [Lagrange.Core](https://github.com/LagrangeDev/Lagrange.Core)
 - [OneBotv11](https://github.com/OneBotv11/OneBotv11)
+- [Zyy955-提供源代码]
