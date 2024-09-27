@@ -57,4 +57,6 @@ if (JSONFile.length > 0) {
 }
 
 common.info('Lain-plugin', `Lain-plugin插件${Bot.lain.version}全部初始化完成~`)
+common.info('Lain-plugin', `By:Zyy955/cnxysoft/空空(功能优化)`)
 common.info('Lain-plugin', 'https://gitee.com/Zyy955/Lain-plugin')
+common.info('Lain-plugin', 'https://github.com/cnxysoft/Lain-plugin')
