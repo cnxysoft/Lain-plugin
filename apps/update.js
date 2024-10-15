@@ -27,7 +27,7 @@ export class update extends plugin {
                 }
             ]
         })
-        this.typeName = 'miaoyu-plugin'
+        this.typeName = 'Lain-plugin'
     }
 
     async update() {
