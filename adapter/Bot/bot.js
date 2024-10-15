@@ -119,10 +119,9 @@ Bot.uploadQQ = async function (file, uin = Bot.uin) {
   uin = Number(uin)
   const buffer = await Bot.Buffer(file)
   try {
-    await Bot[uin].pickGroup(Math.floor(Math.random() * 10000 + 1)).sendMsg([segment.image(buffer)])
-  } catch (e) {
-    throw new Error('上传图片失败', e)
-  }
+    const { message_id } = await Bot[uin].pickUser(uin).sendMsg([segment.image(buffer)])
+    await Bot[uin].pickUser(uin).recallMsg(message_id)
+  } catch { }
   const { width, height } = sizeOf(buffer)
   const md5 = crypto.createHash('md5').update(buffer).digest('hex').toUpperCase()
   const url = `https://gchat.qpic.cn/gchatpic_new/0/0-0-${md5}/0?term=2`
