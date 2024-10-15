@@ -1,4 +1,4 @@
-# 这里是一处Lain-Plugin备份仓库，有一定修改
+# 这里是一处Lain-Plugin备份仓库，有一定修改（现已可以原生更新）
 ## 简介
 `Lain-plugin`是一个围绕喵崽`Miao-Yunzai`开发的多适配器插件，让喵崽接入`QQ频道`、`微信`、`shamrock`等三方平台~，不再局限于ICQQ。
 
@@ -96,3 +96,4 @@ pnpm config set sharp_binary_host "https://npmmirror.com/mirrors/sharp" && pnpm 
 - [xiaoye12123](https://gitee.com/xiaoye12123)
 - [Lagrange.Core](https://github.com/LagrangeDev/Lagrange.Core)
 - [OneBotv11](https://github.com/OneBotv11/OneBotv11)
+- Zyy955（提供源代码）
