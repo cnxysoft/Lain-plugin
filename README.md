@@ -1,6 +1,6 @@
 # 这里是一处Lain-Plugin备份仓库，有一定修改适配Yunzai-next
 ## 简介
-`Lain-plugin`是一个围绕喵崽`Miao-Yunzai`开发的多适配器插件，让喵崽接入`QQ频道`、`微信`、`shamrock`等三方平台~，不再局限于ICQQ。
+`Lain-plugin`是一个围绕喵崽`Miao-Yunzai`开发的多适配器插件，让喵崽接入`QQ频道`、`微信`、`shamrock`、`onebot`等三方平台~，不再局限于ICQQ。
 
 ### 本插件原主开发(Zyy955)从2024年2月20日18:00:00脱离开发，宣布永久停更，并已删除/私有插件原仓库
 ### 支持原作者的新项目（活跃开发中）：[KarinJS/Karin](https://gitee.com/KarinJS/Karin)
