@@ -20,7 +20,7 @@
 
 Github：
 ```
-git clone --depth=1 -b next-pe https://github.com/cnxysoft/Lain-plugin ./plugins/Lain-plugin/
+git clone --depth=1 -b next-pe https://github.com/cnxysoft/Lain-plugin.git ./plugins/Lain-plugin/
 ```
 
 ### 2.安装依赖（Yunzai-Next）
