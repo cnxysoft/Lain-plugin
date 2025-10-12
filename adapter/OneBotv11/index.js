@@ -7,7 +7,7 @@ import { faceMap, pokeMap } from '../../model/shamrock/face.js'
 import api from './api.js'
 
 class OneBotv11Core {
-  constructor(bot, request) {
+  constructor (bot, request) {
     /** 存一下 */
     bot.request = request
     /** 机器人QQ号 */
@@ -21,7 +21,7 @@ class OneBotv11Core {
   }
 
   /** 收到请求 */
-  async event(data) {
+  async event (data) {
     /** 解析得到的JSON */
     data = JSON.parse(data)
     /** debug日志 */
@@ -42,7 +42,7 @@ class OneBotv11Core {
   }
 
   /** 元事件 */
-  async meta_event(data) {
+  async meta_event (data) {
     switch (data.meta_event_type) {
       /** 生命周期 */
       case 'lifecycle':
@@ -60,13 +60,13 @@ class OneBotv11Core {
   }
 
   /** 消息事件 */
-  async message(data) {
+  async message (data) {
     /** 转置消息后给喵崽 */
     await Bot.emit('message', await this.ICQQEvent(data))
   }
 
   /** 自身消息事件 */
-  async message_sent(data) {
+  async message_sent (data) {
     data.post_type = 'message'
     /** 屏蔽由喵崽处理过后发送后的消息 */
     await common.sleep(1500)
@@ -76,7 +76,7 @@ class OneBotv11Core {
   }
 
   /** 通知事件 */
-  async notice(data) {
+  async notice (data) {
     /** 啊啊啊，逼死强迫症 */
     data.post_type = 'notice';
     (async () => {
@@ -94,13 +94,13 @@ class OneBotv11Core {
     switch (data.notice_type) {
       case 'group_msg_emoji_like':
         data.notice_type = 'group'
-        data.sub_type = "msg_emoji_like"
+        data.sub_type = 'msg_emoji_like'
         common.info(this.id, `群消息回应：[${data.group_id}]${data.user_id} 对消息 ${data.message_id} 点了 ${data.likes[0].count} 个 <${faceMap[Number(data.likes[0].emoji_id)]}>`)
         break
       case 'essence':
         data.notice_type = 'group'
         data.set = data.sub_type === 'add'
-        data.sub_type = "essence"
+        data.sub_type = 'essence'
         data.user_id = data.user_id || data.sender_id || data.self_id
         common.info(this.id, `群精华设置：[${data.group_id}]${data.user_id} 的消息 ${data.message_id} 被设为精华`)
         break
@@ -211,13 +211,13 @@ class OneBotv11Core {
         // 异步加载或刷新该群的群成员列表以更新禁言时长
         this.loadGroupMemberList(data.group_id)
         break
-        //return await Bot.emit('notice.group', await this.ICQQEvent(data))
+        // return await Bot.emit('notice.group', await this.ICQQEvent(data))
       }
       case 'notify':
         switch (data.sub_type) {
           case 'poke': {
-            let action = data.poke_detail?.action ?? data.raw_info[2]?.txt ?? (data.raw_info[1]?.type == 'img' ? '特效' : null) ?? '戳了戳'
-            let suffix = data.poke_detail?.suffix ?? data.raw_info[4]?.txt ?? data.raw_info[3]?.txt ?? ''
+            let action = data.poke_detail?.action ?? data.raw_info?.[2]?.txt ?? (data.raw_info?.[1]?.type == 'img' ? '特效' : null) ?? '戳了戳'
+            let suffix = data.poke_detail?.suffix ?? data.raw_info?.[4]?.txt ?? data.raw_info?.[3]?.txt ?? ''
             common.info(this.id, `[${data.user_id}]${action}[${data.target_id}]${suffix}`)
             break
           }
@@ -235,7 +235,7 @@ class OneBotv11Core {
             common.info(this.id, `用户[${data.operator_id}]赞了你的资料卡[${data.times}]次`)
             try {
               let fl = await Bot[this.id].api.get_stranger_info(Number(data.operator_id))
-              e.member = { ...fl }
+              data.member = { ...fl }
             } catch { }
             break
           }
@@ -248,6 +248,7 @@ class OneBotv11Core {
       case 'friend_add':
         // 暂未实现
         break
+      // eslint-disable-next-line no-duplicate-case
       case 'essence': {
         // todo
         common.info(this.id, `群[${data.group_id}]成员[${data.sender_id}]的消息[${data.message_id}]被[${data.operator_id}]${data.sub_type === 'add' ? '设为' : '移除'}精华`)
@@ -288,7 +289,7 @@ class OneBotv11Core {
   }
 
   /** 请求事件 */
-  async request(data) {
+  async request (data) {
     data.post_type = 'request'
     switch (data.request_type) {
       case 'group': {
@@ -348,7 +349,7 @@ class OneBotv11Core {
   }
 
   /** 注册Bot */
-  async LoadBot() {
+  async LoadBot () {
     /** 构建基本参数 */
     Bot[this.id] = {
       ws: this.bot,
@@ -374,6 +375,7 @@ class OneBotv11Core {
       removeEssenceMessage: async (msg_id) => await this.removeEssenceMessage(msg_id),
       makeForwardMsg: async (message) => await this.makeForwardMsg(message),
       getMsg: (msg_id) => this.getMSG(msg_id),
+      getForwardMsg: (msg_id) => this.getForwardMsg(msg_id),
       setMsgEmojiLike: (msg_id, emoji_id) => this.setMsgEmojiLike(msg_id, emoji_id),
       quit: (group_id) => this.quit(group_id),
       getFriendMap: () => Bot[this.id].fl,
@@ -422,10 +424,10 @@ class OneBotv11Core {
   }
 
   /** 加载缓存资源 */
-  async LoadAll() {
+  async LoadAll () {
     /** 获取bot自身信息 */
-    const info = await api.get_login_info(this.id);
-    Bot[this.id].nickname = this.nickname = info?.nickname || '';
+    const info = await api.get_login_info(this.id)
+    Bot[this.id].nickname = this.nickname = info?.nickname || ''
     await Promise.all([
       // 加载群信息
       (async () => {
@@ -443,7 +445,7 @@ class OneBotv11Core {
 
     /** 获取bkn */
     try {
-      let { cookies } = await api.get_cookies(this.id, "qun.qq.com")
+      let { cookies } = await api.get_cookies(this.id, 'qun.qq.com')
       if (cookies) {
         let match = cookies.match(/skey=([^;]+)/)
         if (match) {
@@ -456,7 +458,7 @@ class OneBotv11Core {
         }
       }
     } catch (err) {
-      common.warn(this.id, `OneBotv11获取bkn失败：${error}`)
+      common.warn(this.id, `OneBotv11获取bkn失败：${err}`)
     }
 
     /** 获取cookies */
@@ -483,12 +485,12 @@ class OneBotv11Core {
   }
 
   /** 设置个人资料 */
-  async setQQProfile({ nickname = this.nickname, personal_note, sex, company, email, college, age, birthday } = {}) {
-    return await api.set_qq_profile(this.id, nickname, company, email, college, personal_note, age, birthday, sex);
+  async setQQProfile ({ nickname = this.nickname, personal_note, sex, company, email, college, age, birthday } = {}) {
+    return await api.set_qq_profile(this.id, nickname, company, email, college, personal_note, age, birthday, sex)
   }
 
   /** 设置头像 */
-  async setAvatar(imgPath, groupId) {
+  async setAvatar (imgPath, groupId) {
     if (groupId) {
       return await api.set_group_portrait(this.id, groupId, imgPath)
     } else {
@@ -497,7 +499,7 @@ class OneBotv11Core {
   }
 
   /** 群列表 */
-  async loadGroup(id = this.id) {
+  async loadGroup (id = this.id) {
     let groupList
     for (let retries = 0; retries < 5; retries++) {
       groupList = await api.get_group_list(id)
@@ -521,7 +523,7 @@ class OneBotv11Core {
   }
 
   /** 获取群成员，缓存到gml中 */
-  async loadGroupMemberList(groupId, id = this.id) {
+  async loadGroupMemberList (groupId, id = this.id) {
     try {
       let gml = new Map()
       let memberList = await api.get_group_member_list(id, groupId)
@@ -536,7 +538,7 @@ class OneBotv11Core {
   }
 
   /** 好友列表 */
-  async loadFriendList(id = this.id) {
+  async loadFriendList (id = this.id) {
     let friendList
     for (let retries = 0; retries < 5; retries++) {
       friendList = await api.get_friend_list(id)
@@ -565,7 +567,7 @@ class OneBotv11Core {
   }
 
   /** 群对象 */
-  pickGroup(group_id) {
+  pickGroup (group_id) {
     const name = Bot[this.id].gl.get(group_id)?.group_name || group_id
     const is_admin = Bot[this.id].gml.get(group_id)?.get(this.id)?.role === 'admin'
     const is_owner = Bot[this.id].gml.get(group_id)?.get(this.id)?.role === 'owner'
@@ -580,7 +582,7 @@ class OneBotv11Core {
       /** 制作转发 */
       makeForwardMsg: async (message) => await this.makeForwardMsg(message),
       /** 戳一戳 */
-      pokeMember: async (operator_id) => await api.group_touch(this.id, group_id, operator_id),
+      pokeMember: async (operator_id) => await api.group_poke(this.id, group_id, operator_id),
       /** 禁言 */
       muteMember: async (user_id, time) => await api.set_group_ban(this.id, group_id, Number(user_id), Number(time)),
       /** 全体禁言 */
@@ -641,7 +643,7 @@ class OneBotv11Core {
   }
 
   /** 好友对象 */
-  pickFriend(user_id) {
+  pickFriend (user_id) {
     return {
       thumbUp: async (times) => await this.thumbUp(user_id, times),
       sendMsg: async (msg) => await this.sendFriendMsg(user_id, msg, false),
@@ -677,12 +679,12 @@ class OneBotv11Core {
   * @param {number} times - 点赞次数
   * @return {Promise<void>} - 点赞结果
   */
-  async thumbUp(user_id, times) {
+  async thumbUp (user_id, times) {
     return await api.send_like(this.id, user_id, times)
   }
 
   /** 群员对象 */
-  pickMember(group_id, user_id, refresh = false, cb = () => { }) {
+  pickMember (group_id, user_id, refresh = false, cb = () => { }) {
     if (!refresh) {
       /** 取缓存！！！别问为什么，因为傻鸟同步 */
       let member = Bot[this.id].gml.get(group_id)?.get(user_id) || {}
@@ -700,7 +702,7 @@ class OneBotv11Core {
   }
 
   /** 群成员列表 */
-  async getMemberMap(group_id) {
+  async getMemberMap (group_id) {
     let group_Member = Bot[this.id].gml.get(group_id)
     if (group_Member && Object.keys(group_Member) > 0) return group_Member
     group_Member = new Map()
@@ -712,7 +714,7 @@ class OneBotv11Core {
   }
 
   /** 频道成员列表 */
-  getChannelList(guild_id) {
+  getChannelList (guild_id) {
     return {
       channel_id: 'string',
       channel_name: 'string',
@@ -722,7 +724,7 @@ class OneBotv11Core {
   }
 
   /** 上传群文件 */
-  async upload_group_file(group_id, filePath) {
+  async upload_group_file (group_id, filePath) {
     if (!fs.existsSync(filePath)) return true
     /** 先传到shamrock... */
     const base64 = 'base64://' + fs.readFileSync(filePath).toString('base64')
@@ -732,7 +734,7 @@ class OneBotv11Core {
   }
 
   /** 上传好友文件 */
-  async upload_private_file(user_id, filePath) {
+  async upload_private_file (user_id, filePath) {
     if (!fs.existsSync(filePath)) return true
     /** 先传到shamrock... */
     const base64 = 'base64://' + fs.readFileSync(filePath).toString('base64')
@@ -742,12 +744,12 @@ class OneBotv11Core {
   }
 
   /** 获取文件下载链接 */
-  async getFileUrl() {
+  async getFileUrl () {
     return logger.warn('暂未实现，请先使用 [e.file]')
   }
 
   /** 音乐分享 */
-  async shareMusic(group_id, platform, id) {
+  async shareMusic (group_id, platform, id) {
     if (!['qq', '163'].includes(platform)) {
       return 'platform not supported yet'
     }
@@ -755,19 +757,19 @@ class OneBotv11Core {
   }
 
   /** 设置精华 */
-  async setEssenceMessage(msg_id) {
+  async setEssenceMessage (msg_id) {
     let res = await api.set_essence_msg(this.id, msg_id)
     return res?.result?.errorCode === 0 ? '加精成功' : res?.result?.wording
   }
 
   /** 移除群精华消息 **/
-  async removeEssenceMessage(msg_id) {
+  async removeEssenceMessage (msg_id) {
     let res = await api.delete_essence_msg(this.id, msg_id)
     return res?.result?.errorCode === 0 ? '移精成功' : res?.result?.wording
   }
 
   /** 获取群成员信息 */
-  async getGroupMemberInfo(group_id, user_id, refresh) {
+  async getGroupMemberInfo (group_id, user_id, refresh) {
     /** 被自己坑了 */
     if (user_id == '88888' || user_id == 'stdin') user_id = this.id
     try {
@@ -780,12 +782,12 @@ class OneBotv11Core {
   }
 
   /** 退群 */
-  async quit(group_id) {
+  async quit (group_id) {
     return await api.set_group_leave(this.id, group_id)
   }
 
   /** 制作转发消息 */
-  async makeForwardMsg(data) {
+  async makeForwardMsg (data) {
     if (!Array.isArray(data)) data = [data]
     let makeForwardMsg = {
       /** 标记下，视为转发消息，防止套娃 */
@@ -827,19 +829,19 @@ class OneBotv11Core {
   }
 
   /** 撤回消息 */
-  async recallMsg(msg_id) {
+  async recallMsg (msg_id) {
     // 把已撤回的MSGID存起来，椰奶校验撤回成功与否要用到
     Bot[this.id].recallMsgs.set(msg_id, true)
     return await api.delete_msg(this.id, msg_id)
   }
 
   /** 获取禁言列表 */
-  async getMuteList(group_id) {
+  async getMuteList (group_id) {
     return await api.get_prohibited_member_list(this.id, group_id)
   }
 
   /** 转换消息为ICQQ格式 */
-  async ICQQEvent(data) {
+  async ICQQEvent (data) {
     const { post_type, group_id, user_id, message_type, message_id, sender } = data
     /** 初始化e */
     let e = data
@@ -895,8 +897,8 @@ class OneBotv11Core {
     /** 通知事件 */
     const noticePostType = async function () {
       if (e.sub_type === 'poke') {
-        e.action = e.poke_detail?.action ?? e.raw_info[2]?.txt ?? (e.raw_info[1]?.type == 'img' ? '特效' : null) ?? '戳了戳'
-        e.suffix = e.poke_detail?.suffix ?? e.raw_info[4]?.txt ?? e.raw_info[3]?.txt ?? ''
+        e.action = e.poke_detail?.action ?? e.raw_info?.[2]?.txt ?? (e.raw_info?.[1]?.type == 'img' ? '特效' : null) ?? '戳了戳'
+        e.suffix = e.poke_detail?.suffix ?? e.raw_info?.[4]?.txt ?? e.raw_info?.[3]?.txt ?? ''
         e.raw_message = `${e.user_id} ${e.action} ${e.target_id} ${e.suffix}`
       }
 
@@ -994,7 +996,7 @@ class OneBotv11Core {
  * @param reply 是否处理引用消息，默认处理
  * @return {Promise<{source: (*&{user_id, raw_message: string, reply: *, seq}), message: *[]}|{source: string, message: *[]}>}
  */
-  async getMessage(msg, group_id, reply = true) {
+  async getMessage (msg, group_id, reply = true) {
     let file
     let source
     let message = []
@@ -1217,7 +1219,7 @@ class OneBotv11Core {
    * @param {string} emoji_id - 表情id
    * @return {array|false} -
    */
-  async setMsgEmojiLike(msg_id, emoji_id) {
+  async setMsgEmojiLike (msg_id, emoji_id) {
     if (!msg_id || !emoji_id) return false
     return await api.set_msg_emoji_like(this.id, msg_id, emoji_id)
   }
@@ -1227,7 +1229,7 @@ class OneBotv11Core {
    * @param {number} msg_id
    * @return {array|false} -
    */
-  async getMSG(msg_id) {
+  async getMSG (msg_id) {
     if (!msg_id) return false
     // 查询是否已经撤回过，撤回过的默认不予读取
     if (Bot[this.id].recallMsgs.get(msg_id)) {
@@ -1241,7 +1243,7 @@ class OneBotv11Core {
       while (retryCount < 2) {
         source = await api.get_msg(this.id, msg_id)
         if (typeof source === 'string') {
-          common.error(this.id, `获取引用消息内容失败，正在重试：第 ${retryCount} 次`)
+          common.error(this.id, `获取指定消息内容失败，正在重试：第 ${retryCount} 次`)
           retryCount++
         } else {
           break
@@ -1249,10 +1251,9 @@ class OneBotv11Core {
       }
 
       if (typeof source === 'string') {
-        common.error(this.id, '获取引用消息内容失败，重试次数上限，已终止')
+        common.error(this.id, '获取指定消息内容失败，重试次数上限，已终止')
         return false
       }
-      common.debug('', source)
 
       source = {
         ...source,
@@ -1269,12 +1270,53 @@ class OneBotv11Core {
   }
 
   /**
+   * 获取转发消息
+   * @param {number} msg_id
+   * @return {array|false} -
+   */
+  async getForwardMsg (msg_id) {
+    if (!msg_id) return false
+    // 查询是否已经撤回过，撤回过的默认不予读取
+    if (Bot[this.id].recallMsgs.get(msg_id)) {
+      Bot[this.id].recallMsgs = new Map()
+      return false
+    }
+    let source
+    try {
+      let retryCount = 0
+
+      while (retryCount < 2) {
+        source = await api.get_forward_msg(this.id, msg_id)
+        if (typeof source === 'string') {
+          common.error(this.id, `获取引用消息内容失败，正在重试：第 ${retryCount} 次`)
+          retryCount++
+        } else {
+          break
+        }
+      }
+
+      if (typeof source === 'string') {
+        common.error(this.id, '获取引用消息内容失败，重试次数上限，已终止')
+        return false
+      }
+
+      source = {
+        ...source,
+      }
+      return source
+    } catch (error) {
+      logger.error(error)
+      return false
+    }
+  }
+
+  /**
    * 获取被引用的消息
    * @param {object} i
    * @param {number} group_id
    * @return {array|false} -
    */
-  async source(i, group_id) {
+  async source (i, group_id) {
     /** 引用消息的id */
     const msg_id = i.data.id
     /** id不存在滚犊子... */
@@ -1324,7 +1366,7 @@ class OneBotv11Core {
  * @param {string|object|array} msg - 消息内容
  * @param {boolean} quote - 是否引用回复
  */
-  async sendReplyMsg(e, id, msg, quote) {
+  async sendReplyMsg (e, id, msg, quote) {
     let { message, raw_message, node } = await this.getOneBotv11Core(msg)
 
     if (quote) {
@@ -1341,7 +1383,7 @@ class OneBotv11Core {
    * @param {number} user_id - 好友QQ
    * @param {string|object|array} msg - 消息内容
    */
-  async sendFriendMsg(user_id, msg) {
+  async sendFriendMsg (user_id, msg) {
     const { message, raw_message, node } = await this.getOneBotv11Core(msg)
     return await api.send_private_msg(this.id, user_id, message, raw_message, node)
   }
@@ -1351,7 +1393,7 @@ class OneBotv11Core {
    * @param {number} group_id - 群聊QQ
    * @param {string|object|array} msg - 消息内容
    */
-  async sendGroupMsg(group_id, msg) {
+  async sendGroupMsg (group_id, msg) {
     const { message, raw_message, node } = await this.getOneBotv11Core(msg)
     return await api.send_group_msg(this.id, group_id, message, raw_message, node)
   }
@@ -1360,7 +1402,7 @@ class OneBotv11Core {
    * 转换message为LagrangeCore格式
    * @param {string|Array|object} data - 消息内容
    */
-  async getOneBotv11Core(data) {
+  async getOneBotv11Core (data) {
     let node = data?.test || false
     /** 标准化消息内容 */
     data = common.array(data)
@@ -1498,7 +1540,7 @@ class OneBotv11Core {
         case 'node':
           node = true
           message.push({ type: 'node', data: { ...i.data } })
-          raw_message.push(`<转发消息:${i.data.id || "自造"}>`)
+          raw_message.push(`<转发消息:${i.data.id || '自造'}>`)
           break
         default:
           // 为了兼容更多字段，不再进行序列化，风险是有可能未知字段导致LagrangeCore崩溃
@@ -1518,7 +1560,7 @@ class OneBotv11Core {
   * @param {string} action - 请求 API 端点
   * @param {string} params - 请求参数
   */
-  async sendApi(action, params) {
+  async sendApi (action, params) {
     const echo = randomUUID()
     /** 序列化 */
     const log = JSON.stringify({ echo, action, params })
