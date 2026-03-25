@@ -716,7 +716,8 @@ let api = {
     if (node) {
       // const id = await this.SendApi(uin, 'send_forward_msg', { messages: message.map(i => i.data) })
       // res = await this.SendApi(uin, 'send_private_msg', { user_id, message: { type: 'forward', data: { id } } })
-      if (message[0]?.data?.id) {
+      // Properly formatted nodes have data.uin and data.name (not data.id)
+      if (message[0]?.type === 'node' && message[0]?.data?.uin) {
         res = await this.send_private_forward_msg(uin, user_id, message)
       } else {
         res = await this.send_private_forward_msg(uin, user_id, message.map(i => i.data))
@@ -757,7 +758,8 @@ let api = {
     if (node) {
       // const id = await this.SendApi(uin, 'send_forward_msg', { messages: message.map(i => i.data) })
       // res = await this.SendApi(uin, 'send_group_msg', { group_id, message: { type: 'forward', data: { id } } })
-      if (message[0]?.data?.id) {
+      // Properly formatted nodes have data.uin and data.name (not data.id)
+      if (message[0]?.type === 'node' && message[0]?.data?.uin) {
         res = await this.send_group_forward_msg(uin, group_id, message)
       } else {
         res = await this.send_group_forward_msg(uin, group_id, message.map(i => i.data))

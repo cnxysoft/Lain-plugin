@@ -818,7 +818,7 @@ class OneBotv11Core {
           if (content[0].type === 'node') {
             makeForwardMsg.message.push(...content)
           } else {
-            makeForwardMsg.message.push({ type: 'node', data: { type: 'node', data: { name: this.nickname || 'OneBotv11', uin: String(this.id), content } } })
+            makeForwardMsg.message.push({ type: 'node', data: { uin: String(this.id), name: this.nickname || 'OneBotv11', content } })
           }
         } catch (err) {
           common.error(this.id, err)
